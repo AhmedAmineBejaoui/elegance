@@ -217,10 +217,12 @@ export default function Checkout() {
       const order = await orderRes.json();
       const payRes = await apiRequest(
         "POST",
-        `/api/payments/${paymentMethod}`,
+
+        "/api/payments/konnect",
         {
           amount: Math.round(total * 100),
-          note: order.orderNumber,
+          orderId: order.orderNumber,
+
           returnUrl: `${window.location.origin}/orders/${order.id}`,
         },
       );
@@ -409,16 +411,10 @@ export default function Checkout() {
                       <Label htmlFor="cod">Paiement à la livraison</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="paymee" id="paymee" data-testid="payment-paymee" />
-                      <Label htmlFor="paymee">Paymee</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="flouci" id="flouci" data-testid="payment-flouci" />
-                      <Label htmlFor="flouci">Flouci</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="stripe" id="stripe" data-testid="payment-stripe" />
-                      <Label htmlFor="stripe">Carte (Stripe)</Label>
+
+                      <RadioGroupItem value="konnect" id="konnect" data-testid="payment-konnect" />
+                      <Label htmlFor="konnect">Paiement en ligne (Konnect)</Label>
+
                     </div>
                   </RadioGroup>
 
@@ -466,7 +462,7 @@ export default function Checkout() {
                     <div>
                       <h3 className="font-semibold mb-2">Méthode de paiement</h3>
                       <p className="text-sm text-gray-600" data-testid="payment-summary">
-                        {paymentMethod === "cod" ? "Paiement à la livraison" : "Carte bancaire"}
+                        {paymentMethod === "cod" ? "Paiement à la livraison" : "Paiement en ligne (Konnect)"}
                       </p>
                     </div>
 
