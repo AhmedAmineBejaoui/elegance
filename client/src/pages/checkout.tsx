@@ -215,6 +215,7 @@ export default function Checkout() {
     try {
       const orderRes = await apiRequest("POST", "/api/orders", orderData);
       const order = await orderRes.json();
+
       const endpoint =
         paymentMethod === "flouci" ? "/api/payments/flouci" : "/api/payments/konnect";
       const payRes = await apiRequest(
@@ -223,6 +224,7 @@ export default function Checkout() {
         {
           amount: Math.round(total * 100),
           orderId: order.orderNumber,
+
           returnUrl: `${window.location.origin}/orders/${order.id}`,
         },
       );
@@ -411,12 +413,14 @@ export default function Checkout() {
                       <Label htmlFor="cod">Paiement à la livraison</Label>
                     </div>
                     <div className="flex items-center space-x-2">
+
                       <RadioGroupItem value="konnect" id="konnect" data-testid="payment-konnect" />
                       <Label htmlFor="konnect">Paiement en ligne (Konnect)</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="flouci" id="flouci" data-testid="payment-flouci" />
                       <Label htmlFor="flouci">Paiement en ligne (Flouci)</Label>
+
                     </div>
                   </RadioGroup>
 
@@ -464,6 +468,7 @@ export default function Checkout() {
                     <div>
                       <h3 className="font-semibold mb-2">Méthode de paiement</h3>
                       <p className="text-sm text-gray-600" data-testid="payment-summary">
+
                         {
                           {
                             cod: "Paiement à la livraison",
@@ -471,6 +476,7 @@ export default function Checkout() {
                             flouci: "Paiement en ligne (Flouci)",
                           }[paymentMethod]
                         }
+
                       </p>
                     </div>
 
