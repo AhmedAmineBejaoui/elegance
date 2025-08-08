@@ -217,10 +217,12 @@ export default function Checkout() {
       const order = await orderRes.json();
       const payRes = await apiRequest(
         "POST",
+
         "/api/payments/konnect",
         {
           amount: Math.round(total * 100),
           orderId: order.orderNumber,
+
           returnUrl: `${window.location.origin}/orders/${order.id}`,
         },
       );
@@ -409,8 +411,10 @@ export default function Checkout() {
                       <Label htmlFor="cod">Paiement à la livraison</Label>
                     </div>
                     <div className="flex items-center space-x-2">
+
                       <RadioGroupItem value="konnect" id="konnect" data-testid="payment-konnect" />
                       <Label htmlFor="konnect">Paiement en ligne (Konnect)</Label>
+
                     </div>
                   </RadioGroup>
 
