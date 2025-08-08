@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
+import paymentRouter from "./payments";
 import { insertProductSchema, insertCategorySchema, insertOrderSchema, insertCartItemSchema, insertReviewSchema, insertNewsletterSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -30,6 +31,9 @@ app.get("/api/auth/user", (req, res) => {
   res.set("Cache-Control", "private, max-age=60");
   res.json({ user });
 });
+
+  // Payment routes
+  app.use("/api/payments", isAuthenticated, paymentRouter);
 
   // Newsletter subscription route
   app.post('/api/newsletter', async (req, res) => {

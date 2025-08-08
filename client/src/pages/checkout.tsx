@@ -183,7 +183,7 @@ export default function Checkout() {
     setCurrentStep(currentStep - 1);
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!validateStep(currentStep)) {
       toast({
         title: "Informations manquantes",
@@ -204,11 +204,37 @@ export default function Checkout() {
       shippingAddress,
       billingAddress: sameAsBilling ? shippingAddress : billingAddress,
       paymentMethod,
-      paymentStatus: paymentMethod === "cod" ? "pending" : "paid",
       notes: "",
     };
 
-    createOrderMutation.mutate(orderData);
+    if (paymentMethod === "cod") {
+      createOrderMutation.mutate(orderData);
+      return;
+    }
+
+    try {
+      const orderRes = await apiRequest("POST", "/api/orders", orderData);
+      const order = await orderRes.json();
+      const endpoint =
+        paymentMethod === "flouci" ? "/api/payments/flouci" : "/api/payments/konnect";
+      const payRes = await apiRequest(
+        "POST",
+        endpoint,
+        {
+          amount: Math.round(total * 100),
+          orderId: order.orderNumber,
+          returnUrl: `${window.location.origin}/orders/${order.id}`,
+        },
+      );
+      const payment = await payRes.json();
+      window.location.href = payment.url;
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de procéder au paiement.",
+        variant: "destructive",
+      });
+    }
   };
 
   const steps = [
@@ -385,28 +411,19 @@ export default function Checkout() {
                       <Label htmlFor="cod">Paiement à la livraison</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="card" id="card" data-testid="payment-card" />
-                      <Label htmlFor="card">Carte bancaire</Label>
+                      <RadioGroupItem value="konnect" id="konnect" data-testid="payment-konnect" />
+                      <Label htmlFor="konnect">Paiement en ligne (Konnect)</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="flouci" id="flouci" data-testid="payment-flouci" />
+                      <Label htmlFor="flouci">Paiement en ligne (Flouci)</Label>
                     </div>
                   </RadioGroup>
 
-                  {paymentMethod === "card" && (
-                    <div className="mt-6 space-y-4">
-                      <div>
-                        <Label htmlFor="cardNumber">Numéro de carte</Label>
-                        <Input id="cardNumber" placeholder="1234 5678 9012 3456" data-testid="card-number" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="expiry">Date d'expiration</Label>
-                          <Input id="expiry" placeholder="MM/AA" data-testid="card-expiry" />
-                        </div>
-                        <div>
-                          <Label htmlFor="cvv">CVV</Label>
-                          <Input id="cvv" placeholder="123" data-testid="card-cvv" />
-                        </div>
-                      </div>
-                    </div>
+                  {paymentMethod !== "cod" && (
+                    <p className="mt-4 text-sm text-gray-600">
+                      Vous serez redirigé vers une page de paiement sécurisée.
+                    </p>
                   )}
 
                   <div className="mt-6">
@@ -447,7 +464,13 @@ export default function Checkout() {
                     <div>
                       <h3 className="font-semibold mb-2">Méthode de paiement</h3>
                       <p className="text-sm text-gray-600" data-testid="payment-summary">
-                        {paymentMethod === "cod" ? "Paiement à la livraison" : "Carte bancaire"}
+                        {
+                          {
+                            cod: "Paiement à la livraison",
+                            konnect: "Paiement en ligne (Konnect)",
+                            flouci: "Paiement en ligne (Flouci)",
+                          }[paymentMethod]
+                        }
                       </p>
                     </div>
 
