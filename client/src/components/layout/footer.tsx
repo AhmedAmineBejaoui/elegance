@@ -81,7 +81,7 @@ export function Footer() {
           <h3 className="font-bold mb-2">SERVICES</h3>
           <ul className="space-y-1">
             <li><a href="#">Nos boutiques</a></li>
-            <li><a href="#">FAQ</a></li>
+            <li><a href="/faq">FAQ</a></li>
             <li><a href="#">Contact</a></li>
             <li><a href="#">Livraison</a></li>
             <li><a href="#">Retours</a></li>
