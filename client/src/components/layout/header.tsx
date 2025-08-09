@@ -35,6 +35,7 @@ export function Header() {
 
   const navigation = [
     { name: "NOUVEAUTÉS", href: "/products?featured=true", highlight: true },
+
     {
       name: "FEMME",
       items: [
@@ -50,7 +51,7 @@ export function Header() {
         { name: "MANTEAUX & TRENCHS", href: "/manteaux-trenchs" },
         { name: "SHORTS", href: "/shorts" },
       ],
-    },
+
   ];
 
   const handleSearch = (e: React.FormEvent) => {
