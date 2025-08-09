@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+
 import {
   Accordion,
   AccordionContent,
@@ -7,11 +8,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+
 export default function FAQ() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-16">
+
         <h1 className="text-3xl font-bold mb-8">FAQ</h1>
         <Accordion type="single" collapsible className="max-w-2xl mx-auto">
           <AccordionItem value="item-1">
@@ -45,6 +48,7 @@ export default function FAQ() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
       </main>
       <Footer />
     </div>

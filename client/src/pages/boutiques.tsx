@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
+
 // Liste des boutiques physiques d'Elegance
 const boutiques = [
   {
@@ -24,6 +25,7 @@ const boutiques = [
     horaires: "Lun - Dim : 9h00 - 19h00",
   },
 ];
+
 
 export default function Boutiques() {
   return (
@@ -54,6 +56,7 @@ export default function Boutiques() {
             notre collection sur notre boutique en ligne.
           </p>
         </section>
+
       </main>
       <Footer />
     </div>

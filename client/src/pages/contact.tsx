@@ -1,8 +1,10 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+
 
 export default function Contact() {
   return (
@@ -10,6 +12,7 @@ export default function Contact() {
       <Header />
       <main className="flex-1 container mx-auto px-4 py-16">
         <h1 className="text-3xl font-bold mb-4">Contact</h1>
+
         <p className="text-gray-600 mb-8">
           Une question sur votre commande ou sur nos produits ? Envoyez-nous un
           message, notre équipe vous répondra rapidement.
@@ -46,6 +49,7 @@ export default function Contact() {
             support@elegance.tn
           </a>
         </p>
+
       </main>
       <Footer />
     </div>
