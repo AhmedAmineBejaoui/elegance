@@ -21,7 +21,11 @@ export default function Products() {
     minPrice: searchParams.get("minPrice") ? parseFloat(searchParams.get("minPrice")!) : undefined,
     maxPrice: searchParams.get("maxPrice") ? parseFloat(searchParams.get("maxPrice")!) : undefined,
     isFeatured: searchParams.get("featured") === "true" ? true : undefined,
-    isOnSale: searchParams.get("sale") === "true" ? true : undefined,
+    isOnSale:
+      searchParams.get("sale") === "true" ||
+      searchParams.get("promo") === "true"
+        ? true
+        : undefined,
   });
   
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
@@ -50,7 +54,7 @@ export default function Products() {
     if (filters.minPrice) params.set("minPrice", filters.minPrice.toString());
     if (filters.maxPrice) params.set("maxPrice", filters.maxPrice.toString());
     if (filters.isFeatured) params.set("featured", "true");
-    if (filters.isOnSale) params.set("sale", "true");
+    if (filters.isOnSale) params.set("promo", "true");
     if (sortBy !== "newest") params.set("sort", sortBy);
 
     const newSearch = params.toString();
