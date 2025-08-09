@@ -1,12 +1,15 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Truck, Package } from "lucide-react";
+
 
 export default function Livraison() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
       {/* Hero */}
       <section
         className="relative h-60 flex items-center justify-center text-center text-white bg-cover bg-center"
@@ -21,12 +24,14 @@ export default function Livraison() {
       <main className="flex-1 container mx-auto px-4 py-16 space-y-12">
         <section>
           <p className="text-gray-600 text-center max-w-2xl mx-auto">
+
             Nous livrons partout en Tunisie via nos partenaires logistiques.
             Choisissez l'option qui vous convient lors de la commande.
           </p>
         </section>
 
         <section className="grid md:grid-cols-2 gap-8">
+
           <Card>
             <CardHeader className="flex items-center gap-2">
               <Truck className="h-5 w-5 text-primary" />
@@ -63,6 +68,7 @@ export default function Livraison() {
             </CardContent>
           </Card>
         </section>
+
       </main>
       <Footer />
     </div>

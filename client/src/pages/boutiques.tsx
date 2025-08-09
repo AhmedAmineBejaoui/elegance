@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Clock } from "lucide-react";
 
@@ -27,10 +28,12 @@ const boutiques = [
   },
 ];
 
+
 export default function Boutiques() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
       {/* Hero */}
       <section
         className="relative h-60 flex items-center justify-center text-center text-white bg-cover bg-center"
@@ -45,6 +48,7 @@ export default function Boutiques() {
       <main className="flex-1 container mx-auto px-4 py-16 space-y-12">
         <section>
           <p className="text-gray-600 text-center max-w-2xl mx-auto">
+
             Retrouvez l'univers Elegance dans nos magasins à travers la
             Tunisie.
           </p>
@@ -52,6 +56,7 @@ export default function Boutiques() {
 
         <section className="grid gap-8 md:grid-cols-2">
           {boutiques.map((b) => (
+
             <Card key={b.nom}>
               <CardHeader>
                 <CardTitle>{b.nom}</CardTitle>
@@ -65,6 +70,7 @@ export default function Boutiques() {
                 </p>
               </CardContent>
             </Card>
+
           ))}
         </section>
 
@@ -74,6 +80,7 @@ export default function Boutiques() {
             notre collection sur notre boutique en ligne.
           </p>
         </section>
+
       </main>
       <Footer />
     </div>

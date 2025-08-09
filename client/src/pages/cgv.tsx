@@ -1,11 +1,14 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 
 export default function CGV() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
       {/* Hero */}
       <section
         className="relative h-60 flex items-center justify-center text-center text-white bg-cover bg-center"
@@ -22,10 +25,12 @@ export default function CGV() {
       <main className="flex-1 container mx-auto px-4 py-16 space-y-12">
         <section>
           <p className="text-gray-600 text-center max-w-2xl mx-auto">
+
             Les présentes conditions régissent l'ensemble des ventes réalisées
             sur la boutique Elegance.
           </p>
         </section>
+
 
         <section className="grid gap-6 md:grid-cols-2">
           <Card>
@@ -98,6 +103,7 @@ export default function CGV() {
             </CardContent>
           </Card>
         </section>
+
       </main>
       <Footer />
     </div>

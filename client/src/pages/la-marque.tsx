@@ -1,12 +1,15 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+
 
 export default function LaMarque() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
       <main className="flex-1">
         {/* Hero */}
         <section
@@ -52,6 +55,7 @@ export default function LaMarque() {
             </Link>
           </div>
         </section>
+
       </main>
       <Footer />
     </div>

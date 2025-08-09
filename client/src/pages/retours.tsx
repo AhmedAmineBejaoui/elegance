@@ -1,12 +1,15 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RotateCcw, Clock, Info, Wallet } from "lucide-react";
+
 
 export default function Retours() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
       {/* Hero */}
       <section
         className="relative h-60 flex items-center justify-center text-center text-white bg-cover bg-center"
@@ -21,6 +24,7 @@ export default function Retours() {
       <main className="flex-1 container mx-auto px-4 py-16 space-y-12">
         <section>
           <p className="text-gray-600 text-center max-w-2xl mx-auto">
+
             Si un article ne vous convient pas, vous pouvez nous le retourner
             facilement.
           </p>
@@ -77,6 +81,7 @@ export default function Retours() {
             </CardContent>
           </Card>
         </section>
+
       </main>
       <Footer />
     </div>
