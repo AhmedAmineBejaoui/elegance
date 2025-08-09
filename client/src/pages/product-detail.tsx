@@ -55,7 +55,7 @@ export default function ProductDetail() {
 
   const { data: relatedProducts = [] } = useQuery<any[]>({
     queryKey: product?.categoryId
-      ? ["/api/products", { categoryId: product.categoryId, limit: 4 }]
+      ? [`/api/products?categoryId=${product.categoryId}&limit=4`]
       : [],
     enabled: !!product?.categoryId,
   });
