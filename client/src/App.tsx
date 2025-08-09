@@ -14,6 +14,22 @@ import ProductDetail from "@/pages/product-detail";
 import Cart from "@/pages/cart";
 import Checkout from "@/pages/checkout";
 import About from "@/pages/about";
+import Boutiques from "@/pages/boutiques";
+import FAQ from "@/pages/faq";
+import Contact from "@/pages/contact";
+import Livraison from "@/pages/livraison";
+import Retours from "@/pages/retours";
+import ManteauxTrenchs from "@/pages/manteaux-trenchs";
+import Robes from "@/pages/robes";
+import Chemises from "@/pages/chemises";
+import Jupes from "@/pages/jupes";
+import ShortsPage from "@/pages/shorts";
+import Combinaisons from "@/pages/combinaisons";
+import CGV from "@/pages/cgv";
+import MentionsLegales from "@/pages/mentions-legales";
+import DonneesPersonnelles from "@/pages/donnees-personnelles";
+import NousRejoindre from "@/pages/nous-rejoindre";
+import LaMarque from "@/pages/la-marque";
 import Wishlist from "@/pages/wishlist";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProducts from "@/pages/admin/products";
@@ -46,6 +62,22 @@ function Router() {
       <Route path="/checkout" component={Checkout} />
       <Route path="/wishlist" component={Wishlist} />
       <Route path="/about" component={About} />
+      <Route path="/boutiques" component={Boutiques} />
+      <Route path="/faq" component={FAQ} />
+      <Route path="/contact" component={Contact} />
+      <Route path="/livraison" component={Livraison} />
+      <Route path="/retours" component={Retours} />
+      <Route path="/manteaux-trenchs" component={ManteauxTrenchs} />
+      <Route path="/robes" component={Robes} />
+      <Route path="/chemises" component={Chemises} />
+      <Route path="/jupes" component={Jupes} />
+      <Route path="/shorts" component={ShortsPage} />
+      <Route path="/combinaisons" component={Combinaisons} />
+      <Route path="/cgv" component={CGV} />
+      <Route path="/mentions-legales" component={MentionsLegales} />
+      <Route path="/donnees-personnelles" component={DonneesPersonnelles} />
+      <Route path="/nous-rejoindre" component={NousRejoindre} />
+      <Route path="/la-marque" component={LaMarque} />
 
       {isAuthenticated && (
         <>
