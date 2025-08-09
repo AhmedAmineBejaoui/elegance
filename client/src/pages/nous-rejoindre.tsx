@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, Scissors } from "lucide-react";
 
+
 export default function NousRejoindre() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
       {/* Hero */}
       <section
         className="relative h-60 flex items-center justify-center text-center text-white bg-cover bg-center"
@@ -22,12 +24,14 @@ export default function NousRejoindre() {
       <main className="flex-1 container mx-auto px-4 py-16 space-y-12">
         <section>
           <p className="text-gray-600 text-center max-w-2xl mx-auto">
+
             Elegance grandit et recherche des talents passionnés par la mode.
             Consultez nos offres ci-dessous et envoyez votre candidature.
           </p>
         </section>
 
         <section className="grid md:grid-cols-2 gap-8">
+
           <Card>
             <CardHeader className="flex items-center gap-2">
               <Briefcase className="h-5 w-5 text-primary" />
@@ -58,14 +62,17 @@ export default function NousRejoindre() {
               </Button>
             </CardContent>
           </Card>
+
         </section>
 
         <section className="text-center">
           <p className="text-gray-600 mb-4">
+
             Aucune offre ne correspond à votre profil ? Envoyez-nous votre CV à
             jobs@elegance.tn.
           </p>
         </section>
+
       </main>
       <Footer />
     </div>

@@ -1,11 +1,14 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 
 export default function DonneesPersonnelles() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
       {/* Hero */}
       <section
         className="relative h-60 flex items-center justify-center text-center text-white bg-cover bg-center"
@@ -20,11 +23,13 @@ export default function DonneesPersonnelles() {
       <main className="flex-1 container mx-auto px-4 py-16 space-y-12">
         <section>
           <p className="text-gray-600 text-center max-w-2xl mx-auto">
+
             Nous attachons une grande importance à la confidentialité de vos
             données. Cette page explique comment elles sont collectées et
             utilisées.
           </p>
         </section>
+
 
         <section className="grid gap-6 md:grid-cols-2">
           <Card>
@@ -62,6 +67,7 @@ export default function DonneesPersonnelles() {
             </CardContent>
           </Card>
         </section>
+
       </main>
       <Footer />
     </div>

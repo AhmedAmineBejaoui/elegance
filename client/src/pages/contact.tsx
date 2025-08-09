@@ -1,15 +1,18 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail } from "lucide-react";
 
+
 export default function Contact() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
       {/* Hero */}
       <section
         className="relative h-60 flex items-center justify-center text-center text-white bg-cover bg-center"
@@ -23,9 +26,11 @@ export default function Contact() {
       </section>
       <main className="flex-1 container mx-auto px-4 py-16 space-y-12">
         <p className="text-gray-600 text-center max-w-2xl mx-auto">
+
           Une question sur votre commande ou sur nos produits ? Envoyez-nous un
           message, notre équipe vous répondra rapidement.
         </p>
+
 
         <Card className="max-w-xl mx-auto">
           <CardHeader>
@@ -67,6 +72,7 @@ export default function Contact() {
             <Mail className="h-4 w-4" /> support@elegance.tn
           </a>
         </p>
+
       </main>
       <Footer />
     </div>

@@ -1,12 +1,15 @@
+
 import { Link } from "wouter";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 
+
 export default function Jupes() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
       <main className="flex-1">
         <section
           className="relative h-64 flex items-center justify-center text-center text-white bg-cover bg-center"
@@ -28,6 +31,7 @@ export default function Jupes() {
             <Button>Découvrir la collection</Button>
           </Link>
         </section>
+
       </main>
       <Footer />
     </div>

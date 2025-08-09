@@ -1,5 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+
+
 import {
   Accordion,
   AccordionContent,
@@ -12,6 +14,7 @@ export default function FAQ() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
       {/* Hero */}
       <section
         className="relative h-60 flex items-center justify-center text-center text-white bg-cover bg-center"
@@ -24,6 +27,7 @@ export default function FAQ() {
         <h1 className="relative z-10 text-4xl font-bold">FAQ</h1>
       </section>
       <main className="flex-1 container mx-auto px-4 py-16">
+
         <Accordion type="single" collapsible className="max-w-2xl mx-auto">
           <AccordionItem value="item-1">
             <AccordionTrigger>
@@ -56,6 +60,7 @@ export default function FAQ() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
       </main>
       <Footer />
     </div>
