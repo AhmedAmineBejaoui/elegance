@@ -35,9 +35,22 @@ export function Header() {
 
   const navigation = [
     { name: "NOUVEAUTÉS", href: "/products?featured=true", highlight: true },
-    { name: "VÊTEMENTS", href: "/products?category=vetements" },
-    { name: "ACCESSOIRES", href: "/products?category=accessoires" },
-    { name: "CHAUSSURES", href: "/products?category=chaussures" },
+    {
+      name: "FEMME",
+      items: [
+        { name: "ROBES", href: "/robes" },
+        { name: "CHEMISES", href: "/chemises" },
+        { name: "JUPES", href: "/jupes" },
+        { name: "COMBINAISONS", href: "/combinaisons" },
+      ],
+    },
+    {
+      name: "HOMME",
+      items: [
+        { name: "MANTEAUX & TRENCHS", href: "/manteaux-trenchs" },
+        { name: "SHORTS", href: "/shorts" },
+      ],
+    },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
@@ -216,20 +229,44 @@ export function Header() {
                 <SheetContent side="right" className="w-80">
                   <div className="flex flex-col space-y-4 mt-8">
                     {navigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        className={`text-lg font-medium transition-colors ${
-                          location === item.href
-                            ? "text-primary"
-                            : item.highlight
-                            ? "text-red-500"
-                            : "text-gray-700 hover:text-primary"
-                        }`}
-                        data-testid={`mobile-nav-${item.name.toLowerCase()}`}
-                      >
-                        {item.name}
-                      </Link>
+                      item.items ? (
+                        <div key={item.name} className="space-y-2">
+                          <span className="text-lg font-semibold text-gray-900">
+                            {item.name}
+                          </span>
+                          <div className="flex flex-col ml-4 space-y-2">
+                            {item.items.map((sub) => (
+                              <Link
+                                key={sub.name}
+                                href={sub.href}
+                                className={`text-lg font-medium transition-colors ${
+                                  location === sub.href
+                                    ? "text-primary"
+                                    : "text-gray-700 hover:text-primary"
+                                }`}
+                                data-testid={`mobile-nav-${sub.name.toLowerCase()}`}
+                              >
+                                {sub.name}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <Link
+                          key={item.name}
+                          href={item.href!}
+                          className={`text-lg font-medium transition-colors ${
+                            location === item.href
+                              ? "text-primary"
+                              : item.highlight
+                              ? "text-red-500"
+                              : "text-gray-700 hover:text-primary"
+                          }`}
+                          data-testid={`mobile-nav-${item.name.toLowerCase()}`}
+                        >
+                          {item.name}
+                        </Link>
+                      )
                     ))}
 
                     {user?.role === 'admin' && (
@@ -249,18 +286,40 @@ export function Header() {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center justify-center space-x-8 py-2">
             {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`text-sm font-light tracking-wide transition-colors ${
-                  location === item.href
-                    ? "text-foreground border-b border-foreground pb-1"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                data-testid={`nav-${item.name.toLowerCase()}`}
-              >
-                {item.name}
-              </Link>
+              item.items ? (
+                <DropdownMenu key={item.name}>
+                  <DropdownMenuTrigger
+                    className={`text-sm font-light tracking-wide transition-colors ${
+                      item.items.some((sub) => location === sub.href)
+                        ? "text-foreground border-b border-foreground pb-1"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    data-testid={`nav-${item.name.toLowerCase()}`}
+                  >
+                    {item.name}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    {item.items.map((sub) => (
+                      <DropdownMenuItem key={sub.name} asChild>
+                        <Link href={sub.href}>{sub.name}</Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`text-sm font-light tracking-wide transition-colors ${
+                    location === item.href
+                      ? "text-foreground border-b border-foreground pb-1"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  data-testid={`nav-${item.name.toLowerCase()}`}
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
           </div>
         </nav>
