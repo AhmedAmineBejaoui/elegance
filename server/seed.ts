@@ -7,29 +7,33 @@ async function seed() {
     await db.delete(products);
     await db.delete(categories);
 
-    // Insérer des catégories
+    // Insérer des catégories principales alignées avec la navigation
     await db.insert(categories).values([
-      { name: "T-shirts", slug: "t-shirts", isActive: true },
-      { name: "Shoes", slug: "shoes", isActive: true },
+      { name: "Robes", slug: "robes", isActive: true },
+      { name: "Chemises", slug: "chemises", isActive: true },
+      { name: "Jupes", slug: "jupes", isActive: true },
+      { name: "Combinaisons", slug: "combinaisons", isActive: true },
+      { name: "Manteaux & Trenchs", slug: "manteaux-trenchs", isActive: true },
+      { name: "Shorts", slug: "shorts", isActive: true },
     ]);
 
     // Insérer un produit exemple
     await db.insert(products).values({
-      name: "Basic Tee",
-      slug: "basic-tee",
-      price: "45.99",
-      salePrice: "39.99",
-      sku: "BTEE-001",
-      stockQuantity: 20,
-      categoryId: 1,
+      name: "Robe Élégante",
+      slug: "robe-elegante",
+      price: "89.99",
+      salePrice: "79.99",
+      sku: "ROBE-001",
+      stockQuantity: 15,
+      categoryId: 1, // correspond à la catégorie "Robes"
       isActive: true,
       isFeatured: true,
       images: ["https://via.placeholder.com/300"],
-      sizes: ["XS", "S", "M", "L", "XL"],
-      colors: ["Noir", "Blanc"],
-      tags: ["été", "casual"],
-      shortDescription: "T-shirt basique parfait pour l'été.",
-      description: "Un t-shirt basique confortable, idéal pour un usage quotidien.",
+      sizes: ["S", "M", "L"],
+      colors: ["Rouge", "Noir"],
+      tags: ["soirée", "élégant"],
+      shortDescription: "Une robe idéale pour les occasions spéciales.",
+      description: "Cette robe élégante offre une coupe flatteuse et un tissu de qualité supérieure.",
       rating: "4.5",
       reviewCount: 12,
     });

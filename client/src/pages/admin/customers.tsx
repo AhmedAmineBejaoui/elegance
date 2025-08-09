@@ -43,7 +43,9 @@ export default function AdminCustomers() {
   });
 
   const { data: customerOrders = [], isLoading: ordersLoading } = useQuery({
-    queryKey: ["/api/orders", { userId: selectedCustomer?.id }],
+    queryKey: selectedCustomer?.id
+      ? [`/api/orders?userId=${selectedCustomer.id}`]
+      : [],
     enabled: !!selectedCustomer?.id && isAuthenticated && user?.role === 'admin',
   });
 
