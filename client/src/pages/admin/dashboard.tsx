@@ -1,14 +1,28 @@
 import { useEffect } from "react";
-import { Package, ShoppingCart, Users, TrendingUp, AlertTriangle, DollarSign, FolderTree } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Package,
+  ShoppingCart,
+  Users,
+  TrendingUp,
+  AlertTriangle,
+  DollarSign,
+  FolderTree,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Bar, BarChart, CartesianGrid, Cell, XAxis } from "recharts";
 import { Link } from "wouter";
-import type { Product, Order } from "@shared/schema";
+import type { Product } from "@shared/schema";
 
 export default function AdminDashboard() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -80,6 +94,16 @@ export default function AdminDashboard() {
       positive: true,
     },
   ];
+
+  const orderStatusData = [
+    { status: "completed", count: stats?.completedOrders || 0 },
+    { status: "pending", count: stats?.pendingOrders || 0 },
+  ];
+
+  const orderStatusConfig = {
+    completed: { label: "Livrées", color: "hsl(var(--chart-1))" },
+    pending: { label: "En attente", color: "hsl(var(--chart-2))" },
+  } as const;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -173,24 +197,60 @@ export default function AdminDashboard() {
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {statCards.map((stat, index) => (
-                <Card key={index} data-testid={`stat-card-${index}`}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                        <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                        <p className={`text-xs ${stat.positive ? 'text-green-600' : 'text-red-600'} mt-1`}>
-                          {stat.change} ce mois
-                        </p>
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                >
+                  <Card data-testid={`stat-card-${index}`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+                          <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                          <p className={`text-xs ${stat.positive ? 'text-green-600' : 'text-red-600'} mt-1`}>
+                            {stat.change} ce mois
+                          </p>
+                        </div>
+                        <div className="bg-primary/10 p-3 rounded-lg">
+                          <stat.icon className="h-6 w-6 text-primary" />
+                        </div>
                       </div>
-                      <div className="bg-primary/10 p-3 rounded-lg">
-                        <stat.icon className="h-6 w-6 text-primary" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               ))}
             </div>
+
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>Statut des commandes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {statsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                  </div>
+                ) : (
+                  <ChartContainer config={orderStatusConfig} className="h-[300px]">
+                    <BarChart data={orderStatusData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="status"
+                        tickFormatter={(value) => orderStatusConfig[value as keyof typeof orderStatusConfig].label}
+                      />
+                      <ChartTooltip content={<ChartTooltipContent nameKey="status" />} />
+                      <Bar dataKey="count">
+                        {orderStatusData.map((item) => (
+                          <Cell key={item.status} fill={`var(--color-${item.status})`} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ChartContainer>
+                )}
+              </CardContent>
+            </Card>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Recent Orders */}
