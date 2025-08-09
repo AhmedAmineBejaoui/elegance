@@ -9,6 +9,13 @@ import multer from "multer";
 
 const app = express();
 
+// Middleware global (désactive l'avertissement sur toutes les routes)
+app.use((req, res, next) => {
+  res.setHeader('ngrok-skip-browser-warning', 'true');
+  next();
+});
+
+
 // ✅ Middleware pour les JSON / formulaire volumineux
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
