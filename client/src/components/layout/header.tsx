@@ -51,7 +51,6 @@ export function Header() {
         { name: "MANTEAUX & TRENCHS", href: "/manteaux-trenchs" },
         { name: "SHORTS", href: "/shorts" },
       ],
-    },
 
   ];
 
