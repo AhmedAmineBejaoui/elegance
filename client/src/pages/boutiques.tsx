@@ -4,7 +4,6 @@ import { Footer } from "@/components/layout/footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Clock } from "lucide-react";
 
-
 // Liste des boutiques physiques d'Elegance
 const boutiques = [
   {

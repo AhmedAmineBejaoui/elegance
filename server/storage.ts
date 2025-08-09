@@ -398,6 +398,24 @@ export class DatabaseStorage implements IStorage {
 
   async createReview(review: InsertReview): Promise<Review> {
     const [newReview] = await db.insert(reviews).values(review).returning();
+
+    // Update product aggregate rating and review count
+    const [stats] = await db
+      .select({
+        avg: sql<number>`avg(${reviews.rating})`,
+        count: sql<number>`count(*)`,
+      })
+      .from(reviews)
+      .where(eq(reviews.productId, review.productId));
+
+    await db
+      .update(products)
+      .set({
+        rating: stats.avg ? stats.avg.toFixed(2) : "0",
+        reviewCount: stats.count,
+      })
+      .where(eq(products.id, review.productId));
+
     return newReview;
   }
 

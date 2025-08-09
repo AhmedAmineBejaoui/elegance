@@ -21,6 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ProductCard } from "@/components/products/product-card";
@@ -37,6 +39,9 @@ export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [reviewComment, setReviewComment] = useState("");
 
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
@@ -120,6 +125,9 @@ export default function ProductDetail() {
       queryClient.invalidateQueries({
         queryKey: ["/api/products", product?.id, "reviews"],
       });
+      setReviewRating(0);
+      setReviewTitle("");
+      setReviewComment("");
       toast({
         title: "Avis ajouté",
         description: "Votre avis a été publié avec succès.",
@@ -211,6 +219,23 @@ export default function ProductDetail() {
       return;
     }
     addToCartMutation.mutate();
+  };
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (reviewRating === 0) {
+      toast({
+        title: "Note requise",
+        description: "Veuillez sélectionner une note.",
+        variant: "destructive",
+      });
+      return;
+    }
+    addReviewMutation.mutate({
+      rating: reviewRating,
+      title: reviewTitle,
+      comment: reviewComment,
+    });
   };
   return (
     <div className="min-h-screen">
@@ -509,6 +534,45 @@ export default function ProductDetail() {
                     </Card>
                   ))}
                 </div>
+              )}
+
+              {isAuthenticated && (
+                <Card>
+                  <CardContent className="p-6">
+                    <h3 className="font-semibold mb-4">Ajouter un avis</h3>
+                    <form onSubmit={handleSubmitReview} className="space-y-4">
+                      <div className="flex text-yellow-400">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => setReviewRating(i)}
+                            className="focus:outline-none"
+                          >
+                            <Star
+                              className={`h-5 w-5 ${
+                                i <= reviewRating ? "fill-current" : ""
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                      <Input
+                        placeholder="Titre (optionnel)"
+                        value={reviewTitle}
+                        onChange={(e) => setReviewTitle(e.target.value)}
+                      />
+                      <Textarea
+                        placeholder="Votre commentaire"
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                      />
+                      <Button type="submit" disabled={addReviewMutation.isPending}>
+                        Publier l'avis
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
               )}
             </div>
           </TabsContent>
