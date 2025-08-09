@@ -88,6 +88,8 @@ export interface IStorage {
     totalRevenue: number;
     pendingOrders: number;
     completedOrders: number;
+    salesByMonth: Array<{ month: string; thisYear: number; lastYear: number }>;
+    ordersByChannel: Array<{ channel: string; value: number }>;
   }>;
   getProductStats(): Promise<{
     totalProducts: number;
@@ -442,17 +444,50 @@ export class DatabaseStorage implements IStorage {
     totalRevenue: number;
     pendingOrders: number;
     completedOrders: number;
+    salesByMonth: Array<{ month: string; thisYear: number; lastYear: number }>;
+    ordersByChannel: Array<{ channel: string; value: number }>;
   }> {
-    const [totalOrdersResult] = await db.select({ count: sql<number>`count(*)` }).from(orders);
-    const [totalRevenueResult] = await db.select({ sum: sql<number>`sum(${orders.total})` }).from(orders);
-    const [pendingOrdersResult] = await db.select({ count: sql<number>`count(*)` }).from(orders).where(eq(orders.status, "pending"));
-    const [completedOrdersResult] = await db.select({ count: sql<number>`count(*)` }).from(orders).where(eq(orders.status, "delivered"));
+    const allOrders = await db.select().from(orders);
+
+    const totalOrders = allOrders.length;
+    const totalRevenue = allOrders.reduce((sum, o) => sum + Number(o.total), 0);
+    const pendingOrders = allOrders.filter(o => o.status === "pending").length;
+    const completedOrders = allOrders.filter(o => o.status === "delivered").length;
+
+    const currentYear = new Date().getFullYear();
+    const lastYear = currentYear - 1;
+    const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+
+    const salesByMonth = monthNames.map((name, idx) => {
+      const thisYearTotal = allOrders
+        .filter(o => {
+          const d = new Date(o.createdAt!);
+          return d.getFullYear() === currentYear && d.getMonth() === idx;
+        })
+        .reduce((acc, o) => acc + Number(o.total), 0);
+      const lastYearTotal = allOrders
+        .filter(o => {
+          const d = new Date(o.createdAt!);
+          return d.getFullYear() === lastYear && d.getMonth() === idx;
+        })
+        .reduce((acc, o) => acc + Number(o.total), 0);
+      return { month: name, thisYear: thisYearTotal, lastYear: lastYearTotal };
+    });
+
+    const channelMap: Record<string, number> = {};
+    for (const o of allOrders) {
+      const channel = o.paymentMethod || "Autre";
+      channelMap[channel] = (channelMap[channel] || 0) + 1;
+    }
+    const ordersByChannel = Object.entries(channelMap).map(([channel, value]) => ({ channel, value }));
 
     return {
-      totalOrders: totalOrdersResult.count,
-      totalRevenue: totalRevenueResult.sum || 0,
-      pendingOrders: pendingOrdersResult.count,
-      completedOrders: completedOrdersResult.count,
+      totalOrders,
+      totalRevenue,
+      pendingOrders,
+      completedOrders,
+      salesByMonth,
+      ordersByChannel,
     };
   }
 

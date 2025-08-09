@@ -44,7 +44,7 @@ export default function Home() {
                   Découvrir la Collection
                 </Button>
               </Link>
-              <Link href="/products?sale=true">
+              <Link href="/products?promo=true">
                 <Button
                   variant="outline"
                   size="lg"
@@ -139,7 +139,7 @@ export default function Home() {
           <h2 className="text-4xl font-bold mb-4">Soldes d'Été</h2>
           <p className="text-xl mb-8">Jusqu'à 50% de réduction sur une sélection de produits</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/products?sale=true">
+              <Link href="/products?promo=true">
               <Button
                 size="lg"
                 className="bg-white text-primary hover:bg-gray-100 px-8 py-4 text-lg font-semibold"

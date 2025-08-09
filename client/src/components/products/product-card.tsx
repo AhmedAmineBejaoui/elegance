@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Heart, Star } from "lucide-react";
+import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { StarRating } from "@/components/reviews/star-rating";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -165,14 +166,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Rating */}
           <div className="flex items-center space-x-1">
-            <div className="flex text-yellow-400 text-sm">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-3 w-3 ${i < Math.floor(parseFloat(product.rating || "0")) ? "fill-current" : ""}`}
-                />
-              ))}
-            </div>
+            <StarRating value={parseFloat(product.rating || "0")} size="sm" />
             <span className="text-gray-600 text-sm" data-testid={`product-review-count-${product.id}`}>
               ({product.reviewCount || 0})
             </span>

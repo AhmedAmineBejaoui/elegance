@@ -26,8 +26,6 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
-  LineChart,
-  Line,
   BarChart,
   Bar,
   CartesianGrid,
@@ -109,35 +107,12 @@ export default function AdminDashboard() {
     enabled: isAuthenticated && user?.role === "admin",
   });
 
-  // ---- Derived demo fallbacks so charts look alive ----
-  const salesSeries = useMemo(() => {
-    if (stats?.salesByMonth?.length) return stats.salesByMonth;
-    return [
-      { month: "JAN", thisYear: 1000, lastYear: 800 },
-      { month: "FEB", thisYear: 1400, lastYear: 1100 },
-      { month: "MAR", thisYear: 1800, lastYear: 1500 },
-      { month: "APR", thisYear: 1200, lastYear: 1700 },
-      { month: "MAY", thisYear: 2100, lastYear: 1600 },
-      { month: "JUN", thisYear: 2600, lastYear: 1800 },
-      { month: "JUL", thisYear: 2400, lastYear: 1400 },
-      { month: "AUG", thisYear: 3000, lastYear: 2300 },
-      { month: "SEP", thisYear: 2200, lastYear: 2000 },
-      { month: "OCT", thisYear: 2500, lastYear: 1900 },
-      { month: "NOV", thisYear: 3200, lastYear: 2100 },
-      { month: "DEC", thisYear: 3400, lastYear: 2200 },
-    ];
-  }, [stats?.salesByMonth]);
+  const salesSeries = stats?.salesByMonth ?? [];
 
   const channels = useMemo(() => {
-    const base = stats?.ordersByChannel?.length
-      ? stats.ordersByChannel
-      : [
-          { channel: "En ligne", value: 62 },
-          { channel: "Magasin", value: 28 },
-          { channel: "Mail", value: 10 },
-        ];
+    const base = stats?.ordersByChannel ?? [];
     const total = base.reduce((a, b) => a + b.value, 0);
-    return base.map((c) => ({ ...c, pct: Math.round((c.value / total) * 100) }));
+    return base.map((c) => ({ ...c, pct: total ? Math.round((c.value / total) * 100) : 0 }));
   }, [stats?.ordersByChannel]);
 
   // ---- UI Bits ----
@@ -154,33 +129,21 @@ export default function AdminDashboard() {
       title: "Total des commandes",
       value: stats?.totalOrders ?? 0,
       icon: ShoppingCart,
-      change: "+12%",
-      positive: true,
-      spark: [30, 45, 60, 50, 80, 95, 110, 120],
     },
     {
       title: "Revenus totaux",
       value: `${typeof stats?.totalRevenue === "number" ? stats.totalRevenue.toFixed(2) : "0.00"} DT`,
       icon: DollarSign,
-      change: "+8%",
-      positive: true,
-      spark: [10, 20, 28, 25, 40, 36, 50, 65],
     },
     {
       title: "Produits",
       value: stats?.totalProducts ?? 0,
       icon: Package,
-      change: "+3",
-      positive: true,
-      spark: [5, 7, 6, 9, 11, 10, 12, 13],
     },
     {
       title: "Clients",
       value: stats?.totalCustomers ?? 0,
       icon: Users,
-      change: "+15",
-      positive: true,
-      spark: [3, 6, 8, 12, 14, 16, 17, 19],
     },
   ];
 
@@ -255,30 +218,13 @@ export default function AdminDashboard() {
                       <div className="flex items-start justify-between">
                         <div>
                           <p className="text-muted-foreground text-xs font-medium">{s.title}</p>
-                          <div className="mt-1 flex items-baseline gap-2">
+                          <div className="mt-1">
                             <span className="text-2xl font-semibold">{s.value}</span>
-                            <span className={`text-xs ${s.positive ? "text-green-600" : "text-red-600"}`}>{s.change}</span>
                           </div>
                         </div>
                         <div className="p-3 rounded-xl bg-primary/10 text-primary">
                           <s.icon className="h-5 w-5" />
                         </div>
-                      </div>
-                      {/* Sparkline */}
-                      <div className="mt-4 h-16 -mx-2">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={s.spark.map((v, idx) => ({ x: idx, y: v }))}>
-                            <defs>
-                              <linearGradient id={`spark-${i}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor={SERIES[0]} stopOpacity={0.45} />
-                                <stop offset="100%" stopColor={SERIES[0]} stopOpacity={0} />
-                              </linearGradient>
-                            </defs>
-                            <Area type="monotone" dataKey="y" stroke={SERIES[0]} fill={`url(#spark-${i})`} strokeWidth={2} />
-                            <XAxis dataKey="x" hide />
-                            <YAxis hide />
-                          </AreaChart>
-                        </ResponsiveContainer>
                       </div>
                     </CardContent>
                   </Card>
@@ -455,31 +401,6 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              {/* Orders trend mini chart */}
-              <Card>
-                <CardHeader className="pb-2"><CardTitle className="flex items-center gap-2"><BarChart2 className="h-5 w-5"/>Commandes hebdomadaires</CardTitle></CardHeader>
-                <CardContent className="pt-0">
-                  <div className="h-[260px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={[
-                        { d: "Mon", v: 12 },
-                        { d: "Tue", v: 19 },
-                        { d: "Wed", v: 14 },
-                        { d: "Thu", v: 23 },
-                        { d: "Fri", v: 17 },
-                        { d: "Sat", v: 10 },
-                        { d: "Sun", v: 15 },
-                      ]}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="d" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="v" stroke={SERIES[1]} strokeWidth={2} dot={false} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
 
             {/* Quick actions */}
