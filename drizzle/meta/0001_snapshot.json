@@ -35,7 +35,6 @@
         },
         "size": {
           "name": "size",
-
           "type": "varchar",
 
           "primaryKey": false,
@@ -43,7 +42,6 @@
         },
         "color": {
           "name": "color",
-
           "type": "varchar",
 
           "primaryKey": false,
@@ -64,7 +62,6 @@
           "default": "now()"
         }
       },
-
       "indexes": {},
       "foreignKeys": {},
 
@@ -104,7 +101,6 @@
         },
         "image_url": {
           "name": "image_url",
-
           "type": "varchar",
 
           "primaryKey": false,
@@ -138,7 +134,6 @@
           "default": "now()"
         }
       },
-
       "indexes": {},
       "foreignKeys": {},
 
@@ -232,7 +227,6 @@
         },
         "size": {
           "name": "size",
-
           "type": "varchar",
 
           "primaryKey": false,
@@ -240,7 +234,6 @@
         },
         "color": {
           "name": "color",
-
           "type": "varchar",
 
           "primaryKey": false,
@@ -368,6 +361,7 @@
         }
       },
       "indexes": {},
+      "foreignKeys": {},
 
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
