@@ -35,9 +35,9 @@ export function Header() {
 
   const navigation = [
     { name: "NOUVEAUTÉS", href: "/products?featured=true", highlight: true },
-    { name: "VÊTEMENTS", href: "/products?category=vetements" },
-    { name: "ACCESSOIRES", href: "/products?category=accessoires" },
-    { name: "CHAUSSURES", href: "/products?category=chaussures" },
+    { name: "ROBES", href: "/robes" },
+    { name: "CHEMISES", href: "/chemises" },
+    { name: "JUPES", href: "/jupes" },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
