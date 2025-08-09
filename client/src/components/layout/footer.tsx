@@ -76,46 +76,60 @@ export function Footer() {
       </div>
 
       {/* Navigation Links */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-6 px-6 py-10 text-gray-800">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-6 px-6 py-10 text-gray-800">
         <div>
           <h3 className="font-bold mb-2">SERVICES</h3>
           <ul className="space-y-1">
-            <li><a href="#">Nos boutiques</a></li>
+            <li><a href="/boutiques">Nos boutiques</a></li>
             <li><a href="/faq">FAQ</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Livraison</a></li>
-            <li><a href="#">Retours</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/livraison">Livraison</a></li>
+            <li><a href="/retours">Retours</a></li>
           </ul>
         </div>
         <div>
           <h3 className="font-bold mb-2">SÉLECTIONS</h3>
           <ul className="space-y-1">
-            <li><a href="#">Manteaux & Trenchs</a></li>
-            <li><a href="#">Robes</a></li>
-            <li><a href="#">Chemises</a></li>
+            <li><a href="/manteaux-trenchs">Manteaux & Trenchs</a></li>
+            <li><a href="/robes">Robes</a></li>
+            <li><a href="/chemises">Chemises</a></li>
           </ul>
         </div>
         <div>
           <h3 className="font-bold mb-2">SÉLECTIONS</h3>
           <ul className="space-y-1">
-            <li><a href="#">Jupes</a></li>
-            <li><a href="#">Shorts</a></li>
-            <li><a href="#">Combinaisons</a></li>
+            <li><a href="/jupes">Jupes</a></li>
+            <li><a href="/shorts">Shorts</a></li>
+            <li><a href="/combinaisons">Combinaisons</a></li>
           </ul>
         </div>
         <div>
           <h3 className="font-bold mb-2">INFORMATIONS</h3>
           <ul className="space-y-1">
-            <li><a href="#">CGV</a></li>
-            <li><a href="#">Mentions légales</a></li>
-            <li><a href="#">Données personnelles</a></li>
-            <li><a href="#">Nous rejoindre</a></li>
+            <li><a href="/cgv">CGV</a></li>
+            <li><a href="/mentions-legales">Mentions légales</a></li>
+            <li><a href="/donnees-personnelles">Données personnelles</a></li>
+            <li><a href="/nous-rejoindre">Nous rejoindre</a></li>
           </ul>
         </div>
         <div>
           <h3 className="font-bold mb-2">NAF NAF</h3>
           <ul className="space-y-1">
-            <li><a href="#">La Marque</a></li>
+            <li><a href="/la-marque">La Marque</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 className="font-bold mb-2">PAGES</h3>
+          <ul className="space-y-1">
+            <li><a href="/">Accueil</a></li>
+            <li><a href="/products">Produits</a></li>
+            <li><a href="/about">À propos</a></li>
+            <li><a href="/cart">Panier</a></li>
+            <li><a href="/checkout">Paiement</a></li>
+            <li><a href="/wishlist">Favoris</a></li>
+            <li><a href="/profile">Profil</a></li>
+            <li><a href="/orders">Commandes</a></li>
+            <li><a href="/auth">Connexion</a></li>
           </ul>
         </div>
       </div>
