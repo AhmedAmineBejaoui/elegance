@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRoute, Link } from "wouter";
 import {
-  Star,
   Heart,
   ShoppingBag,
   Plus,
@@ -26,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ProductCard } from "@/components/products/product-card";
+import { StarRating } from "@/components/reviews/star-rating";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -309,14 +309,7 @@ export default function ProductDetail() {
 
             {/* Rating */}
             <div className="flex items-center space-x-2">
-              <div className="flex text-yellow-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`h-5 w-5 ${i < Math.floor(averageRating) ? "fill-current" : ""}`}
-                  />
-                ))}
-              </div>
+              <StarRating value={averageRating} />
               <span className="text-gray-600" data-testid="product-rating">
                 {averageRating.toFixed(1)} ({reviews.length} avis)
               </span>
@@ -513,14 +506,7 @@ export default function ProductDetail() {
                             <h4 className="font-semibold">
                               {review.user.firstName} {review.user.lastName}
                             </h4>
-                            <div className="flex text-yellow-400 text-sm">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-4 w-4 ${i < review.rating ? "fill-current" : ""}`}
-                                />
-                              ))}
-                            </div>
+                            <StarRating value={review.rating} size="sm" />
                           </div>
                           <span className="text-sm text-gray-500">
                             {new Date(review.createdAt).toLocaleDateString()}
@@ -541,22 +527,7 @@ export default function ProductDetail() {
                   <CardContent className="p-6">
                     <h3 className="font-semibold mb-4">Ajouter un avis</h3>
                     <form onSubmit={handleSubmitReview} className="space-y-4">
-                      <div className="flex text-yellow-400">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <button
-                            key={i}
-                            type="button"
-                            onClick={() => setReviewRating(i)}
-                            className="focus:outline-none"
-                          >
-                            <Star
-                              className={`h-5 w-5 ${
-                                i <= reviewRating ? "fill-current" : ""
-                              }`}
-                            />
-                          </button>
-                        ))}
-                      </div>
+                      <StarRating value={reviewRating} onChange={setReviewRating} />
                       <Input
                         placeholder="Titre (optionnel)"
                         value={reviewTitle}
