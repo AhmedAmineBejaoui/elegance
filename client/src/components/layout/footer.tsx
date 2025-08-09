@@ -41,7 +41,7 @@ export function Footer() {
         <div>
           <Truck className="mx-auto mb-1 h-5 w-5" />
           <strong className="block">LIVRAISON GRATUITE</strong>
-          <p>Offerte à partir de 89€ d'achats</p>
+          <p>Offerte à partir de 150 DT d'achats</p>
         </div>
         <div>
           <RotateCcw className="mx-auto mb-1 h-5 w-5" />

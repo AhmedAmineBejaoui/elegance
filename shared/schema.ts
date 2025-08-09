@@ -1,4 +1,5 @@
-import { sql } from 'drizzle-orm';
+// drizzle/schema.ts
+import { sql } from "drizzle-orm";
 import {
   index,
   jsonb,
@@ -7,7 +8,7 @@ import {
   varchar,
   text,
   integer,
-  decimal,
+  numeric,
   boolean,
   serial,
 } from "drizzle-orm/pg-core";
@@ -15,139 +16,249 @@ import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table for authentication
+/* ----------------------------- Auth / Sessions ----------------------------- */
+
 export const sessions = pgTable(
   "sessions",
   {
     sid: varchar("sid").primaryKey(),
     sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
+    expire: timestamp("expire", { withTimezone: false }).notNull(),
   },
-  (table) => [index("IDX_session_expire").on(table.expire)],
+  (table) => [index("idx_sessions_expire").on(table.expire)],
 );
 
-// User storage table for authentication
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique(),
-  passwordHash: varchar("password_hash"),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
-  phone: varchar("phone"),
-  address: text("address"),
-  city: varchar("city"),
-  postalCode: varchar("postal_code"),
-  role: varchar("role").notNull().default("customer"), // customer, admin
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const users = pgTable(
+  "users",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    email: varchar("email", { length: 255 }).unique(),
+    passwordHash: varchar("password_hash", { length: 255 }),
+    firstName: varchar("first_name", { length: 255 }),
+    lastName: varchar("last_name", { length: 255 }),
+    profileImageUrl: varchar("profile_image_url", { length: 1024 }),
+    phone: varchar("phone", { length: 64 }),
+    address: text("address"),
+    city: varchar("city", { length: 255 }),
+    postalCode: varchar("postal_code", { length: 32 }),
+    role: varchar("role", { length: 32 }).notNull().default("customer"), // customer | admin
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: false }).defaultNow(),
+  },
+  (t) => [index("idx_users_email_null_ok").on(t.email)],
+);
 
-export const categories = pgTable("categories", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  slug: varchar("slug", { length: 255 }).notNull().unique(),
-  description: text("description"),
-  imageUrl: varchar("image_url"),
-  parentId: integer("parent_id"),
-  isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+/* -------------------------------- Categories -------------------------------- */
 
-export const products = pgTable("products", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  slug: varchar("slug", { length: 255 }).notNull().unique(),
-  description: text("description"),
-  shortDescription: text("short_description"),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  salePrice: decimal("sale_price", { precision: 10, scale: 2 }),
-  sku: varchar("sku", { length: 100 }).unique(),
-  stockQuantity: integer("stock_quantity").notNull().default(0),
-  categoryId: integer("category_id").notNull(),
-  images: text("images").array().default([]),
-  sizes: text("sizes").array().default([]),
-  colors: text("colors").array().default([]),
-  tags: text("tags").array().default([]),
-  isActive: boolean("is_active").notNull().default(true),
-  isFeatured: boolean("is_featured").notNull().default(false),
-  rating: decimal("rating", { precision: 3, scale: 2 }).default("0"),
-  reviewCount: integer("review_count").notNull().default(0),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const categories = pgTable(
+  "categories",
+  {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 255 }).notNull().unique(),
+    description: text("description"),
+    imageUrl: varchar("image_url", { length: 1024 }),
+    parentId: integer("parent_id").references(() => categories.id, {
+      onDelete: "set null",
+    }),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: false }).defaultNow(),
+  },
+  (t) => [index("idx_categories_parent").on(t.parentId)],
+);
 
-export const orders = pgTable("orders", {
-  id: serial("id").primaryKey(),
-  orderNumber: varchar("order_number", { length: 50 }).notNull().unique(),
-  userId: varchar("user_id").notNull(),
-  status: varchar("status").notNull().default("pending"), // pending, processing, shipped, delivered, cancelled
-  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
-  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
-  tax: decimal("tax", { precision: 10, scale: 2 }).notNull().default("0"),
-  shipping: decimal("shipping", { precision: 10, scale: 2 }).notNull().default("0"),
-  shippingAddress: jsonb("shipping_address").notNull(),
-  billingAddress: jsonb("billing_address"),
-  paymentMethod: varchar("payment_method"),
-  paymentStatus: varchar("payment_status").notNull().default("pending"), // pending, paid, failed, refunded
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+/* --------------------------------- Products --------------------------------- */
 
-export const orderItems = pgTable("order_items", {
-  id: serial("id").primaryKey(),
-  orderId: integer("order_id").notNull(),
-  productId: integer("product_id").notNull(),
-  quantity: integer("quantity").notNull(),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
-  size: varchar("size"),
-  color: varchar("color"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+export const products = pgTable(
+  "products",
+  {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 255 }).notNull().unique(),
+    description: text("description"),
+    shortDescription: text("short_description"),
 
-export const cartItems = pgTable("cart_items", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull(),
-  productId: integer("product_id").notNull(),
-  quantity: integer("quantity").notNull(),
-  size: varchar("size"),
-  color: varchar("color"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+    // Prix en numeric (Postgres -> renvoyé en string par pg : on coerced côté code)
+    price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+    salePrice: numeric("sale_price", { precision: 10, scale: 2 }),
 
-export const reviews = pgTable("reviews", {
-  id: serial("id").primaryKey(),
-  productId: integer("product_id").notNull(),
-  userId: varchar("user_id").notNull(),
-  rating: integer("rating").notNull(),
-  title: varchar("title"),
-  comment: text("comment"),
-  isVerified: boolean("is_verified").notNull().default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+    sku: varchar("sku", { length: 100 }).unique(),
+    stockQuantity: integer("stock_quantity").notNull().default(0),
 
-export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
-  id: serial("id").primaryKey(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+    categoryId: integer("category_id")
+      .notNull()
+      .references(() => categories.id, { onDelete: "restrict" }),
 
-// Relations
+    // Tableaux: default SQL corrects
+    images: text("images")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+
+    sizes: text("sizes")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+
+    colors: text("colors")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+
+    tags: text("tags")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+
+    isActive: boolean("is_active").notNull().default(true),
+    isFeatured: boolean("is_featured").notNull().default(false),
+
+    // ✅ On stocke une moyenne d’étoiles et un compteur
+    averageRating: numeric("average_rating", { precision: 2, scale: 1 }).default("0.0"),
+    reviewsCount: integer("reviews_count").notNull().default(0),
+
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: false }).defaultNow(),
+  },
+  (t) => [index("idx_products_category").on(t.categoryId)],
+);
+
+/* ---------------------------------- Orders ---------------------------------- */
+
+export const orders = pgTable(
+  "orders",
+  {
+    id: serial("id").primaryKey(),
+    orderNumber: varchar("order_number", { length: 50 }).notNull().unique(),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+
+    status: varchar("status", { length: 32 }).notNull().default("pending"), // pending, processing, shipped, delivered, cancelled
+
+    total: numeric("total", { precision: 10, scale: 2 }).notNull(),
+    subtotal: numeric("subtotal", { precision: 10, scale: 2 }).notNull(),
+    tax: numeric("tax", { precision: 10, scale: 2 }).notNull().default("0"),
+    shipping: numeric("shipping", { precision: 10, scale: 2 })
+      .notNull()
+      .default("0"),
+
+    shippingAddress: jsonb("shipping_address").notNull(),
+    billingAddress: jsonb("billing_address"),
+
+    paymentMethod: varchar("payment_method", { length: 64 }),
+    paymentStatus: varchar("payment_status", { length: 32 })
+      .notNull()
+      .default("pending"), // pending, paid, failed, refunded
+
+    notes: text("notes"),
+
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: false }).defaultNow(),
+  },
+  (t) => [index("idx_orders_user").on(t.userId)],
+);
+
+export const orderItems = pgTable(
+  "order_items",
+  {
+    id: serial("id").primaryKey(),
+    orderId: integer("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    productId: integer("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "restrict" }),
+
+    quantity: integer("quantity").notNull(),
+    price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+
+    size: varchar("size", { length: 64 }),
+    color: varchar("color", { length: 64 }),
+
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow(),
+  },
+  (t) => [index("idx_order_items_order").on(t.orderId)],
+);
+
+/* ---------------------------------- Cart ----------------------------------- */
+
+export const cartItems = pgTable(
+  "cart_items",
+  {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    productId: integer("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "restrict" }),
+
+    quantity: integer("quantity").notNull(),
+
+    size: varchar("size", { length: 64 }),
+    color: varchar("color", { length: 64 }),
+
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: false }).defaultNow(),
+  },
+  (t) => [
+    index("idx_cart_user").on(t.userId),
+    index("idx_cart_user_product").on(t.userId, t.productId),
+  ],
+);
+
+/* --------------------------------- Reviews --------------------------------- */
+
+export const reviews = pgTable(
+  "reviews",
+  {
+    id: serial("id").primaryKey(),
+    productId: integer("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+
+    rating: integer("rating").notNull(), // 1..5
+    title: varchar("title", { length: 255 }),
+    comment: text("comment"),
+    isVerified: boolean("is_verified").notNull().default(false),
+
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: false }).defaultNow(),
+  },
+  (t) => [
+    index("idx_reviews_product").on(t.productId),
+    index("idx_reviews_user").on(t.userId),
+  ],
+);
+
+/* ------------------------ Newsletter subscriptions ------------------------- */
+
+export const newsletterSubscriptions = pgTable(
+  "newsletter_subscriptions",
+  {
+    id: serial("id").primaryKey(),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    createdAt: timestamp("created_at", { withTimezone: false }).defaultNow(),
+  },
+);
+
+/* --------------------------------- Relations -------------------------------- */
+
 export const categoriesRelations = relations(categories, ({ many, one }) => ({
   parent: one(categories, {
     fields: [categories.parentId],
     references: [categories.id],
-    relationName: 'categoryHierarchy',   // <— même nom des deux côtés
+    relationName: "categoryHierarchy",
   }),
   children: many(categories, {
-    relationName: 'categoryHierarchy',   // <— idem
+    relationName: "categoryHierarchy",
   }),
 }));
-
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
@@ -200,7 +311,8 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   }),
 }));
 
-// Insert schemas
+/* --------------------------------- Zod Schemas ------------------------------ */
+
 export const insertCategorySchema = createInsertSchema(categories).omit({
   id: true,
   createdAt: true,
@@ -212,29 +324,20 @@ export const insertProductSchema = createInsertSchema(products)
     id: true,
     createdAt: true,
     updatedAt: true,
+    // averageRating / reviewsCount sont calculés côté serveur
+    averageRating: true,
+    reviewsCount: true,
   })
   .extend({
-    // Accept numbers for decimal fields and convert to strings for the database
+    // Accepter number | string -> stocker en string (pg numeric)
     price: z.preprocess(
-      (val) => (val !== undefined && val !== null ? String(val) : val),
+      (v) => (v === "" || v === undefined || v === null ? undefined : String(v)),
       z.string(),
     ),
     salePrice: z.preprocess(
-      (val) =>
-        val === undefined || val === null || val === ""
-          ? null
-          : String(val),
+      (v) => (v === "" || v === undefined || v === null ? null : String(v)),
       z.string().nullable(),
     ),
-
-    rating: z.preprocess(
-      (val) =>
-        val === undefined || val === null || val === ""
-          ? undefined
-          : String(val),
-      z.string(),
-    ).optional(),
-
   });
 
 export const insertOrderSchema = createInsertSchema(orders).omit({
@@ -260,28 +363,36 @@ export const insertReviewSchema = createInsertSchema(reviews).omit({
   updatedAt: true,
 });
 
-export const insertNewsletterSchema = createInsertSchema(newsletterSubscriptions).omit({
+export const insertNewsletterSchema = createInsertSchema(
+  newsletterSubscriptions,
+).omit({
   id: true,
   createdAt: true,
 });
 
-// Types
+/* ---------------------------------- Types ---------------------------------- */
+
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
-export type UpdateUser = Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>;
+export type UpdateUser = Partial<Omit<User, "id" | "createdAt" | "updatedAt">>;
 
-// Orders schema types
 export type Order = typeof orders.$inferSelect;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
+
 export type InsertCategory = z.infer<typeof insertCategorySchema>;
 export type Category = typeof categories.$inferSelect;
+
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type Product = typeof products.$inferSelect;
+
 export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
 export type OrderItem = typeof orderItems.$inferSelect;
+
 export type InsertCartItem = z.infer<typeof insertCartItemSchema>;
 export type CartItem = typeof cartItems.$inferSelect;
+
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
+
 export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSchema>;
 export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
