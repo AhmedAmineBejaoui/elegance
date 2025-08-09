@@ -52,7 +52,7 @@ export function Header() {
         { name: "SHORTS", href: "/shorts" },
       ],
 
-  ];
+  }];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
