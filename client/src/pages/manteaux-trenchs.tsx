@@ -14,7 +14,7 @@ export default function ManteauxTrenchs() {
           className="relative h-64 flex items-center justify-center text-center text-white bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1495121605193-b116b5b09f22?auto=format&fit=crop&w=1350&q=80')",
+              "url('https://images.unsplash.com/photo-1589363360147-4f2d51541551?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
           }}
         >
           <div className="absolute inset-0 bg-black/40" />

@@ -113,10 +113,8 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <h3 className="font-bold mb-2">NAF NAF</h3>
-          <ul className="space-y-1">
-            <li><a href="/la-marque">La Marque</a></li>
-          </ul>
+          
+          
         </div>
         <div>
           <h3 className="font-bold mb-2">PAGES</h3>
@@ -136,7 +134,7 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t py-4 px-6 flex flex-col md:flex-row items-center justify-between text-xs">
-        <div className="mb-2 md:mb-0 font-semibold">NAF NAF PARIS</div>
+        <div className="mb-2 md:mb-0 font-semibold">ELEGANCE © 2025 </div>
         <div className="flex space-x-6">
           <a href="#" className="flex items-center gap-1"><Instagram className="w-4 h-4" /> INSTAGRAM</a>
           <a href="#" className="flex items-center gap-1"><Facebook className="w-4 h-4" /> FACEBOOK</a>

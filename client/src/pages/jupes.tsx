@@ -15,7 +15,7 @@ export default function Jupes() {
           className="relative h-64 flex items-center justify-center text-center text-white bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1520975674857-1a04db9a7a31?auto=format&fit=crop&w=1350&q=80')",
+              "url('https://images.unsplash.com/photo-1729232822237-3e35d7799ee5?q=80&w=1092&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
           }}
         >
           <div className="absolute inset-0 bg-black/40" />

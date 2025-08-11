@@ -15,7 +15,7 @@ export default function Livraison() {
         className="relative h-60 flex items-center justify-center text-center text-white bg-cover bg-center"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1596484552941-3b98c41d6655?auto=format&fit=crop&w=1350&q=80')",
+            "url('https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?q=80&w=765&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
         }}
       >
         <div className="absolute inset-0 bg-black/40" />

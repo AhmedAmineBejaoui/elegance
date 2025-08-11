@@ -15,7 +15,7 @@ export default function Combinaisons() {
           className="relative h-64 flex items-center justify-center text-center text-white bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1589571894960-20bbe2828f87?auto=format&fit=crop&w=1350&q=80')",
+              "url('https://images.unsplash.com/photo-1713689824343-77d2f99e19b8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
           }}
         >
           <div className="absolute inset-0 bg-black/40" />

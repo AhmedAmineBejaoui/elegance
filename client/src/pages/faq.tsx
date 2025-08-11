@@ -19,7 +19,7 @@ export default function FAQ() {
         className="relative h-60 flex items-center justify-center text-center text-white bg-cover bg-center"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1485115905815-74a5c9fda2a5?auto=format&fit=crop&w=1350&q=80')",
+            "url('https://plus.unsplash.com/premium_photo-1678216286021-e81f66761751?q=80&w=923&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
         }}
       >
         <div className="absolute inset-0 bg-black/40" />

@@ -271,7 +271,7 @@ export default function AdminCategories() {
                       />
                     </div>
                     <Button
-                      onClick={() => createCategoryMutation.mutate(formData as InsertCategory)}
+                      onClick={() => createCategoryMutation.mutate(formData as unknown as InsertCategory)}
                       disabled={createCategoryMutation.isPending}
                       data-testid="confirm-add-category"
                     >
