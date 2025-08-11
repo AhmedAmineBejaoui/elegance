@@ -83,7 +83,10 @@ export default function Products() {
       case "name":
         return a.name.localeCompare(b.name);
       case "rating":
-        return parseFloat(b.rating || "0") - parseFloat(a.rating || "0");
+        return (
+          parseFloat(b.averageRating || "0") -
+          parseFloat(a.averageRating || "0")
+        );
       case "newest":
       default:
         return (

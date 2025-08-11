@@ -166,9 +166,12 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Rating */}
           <div className="flex items-center space-x-1">
-            <StarRating value={parseFloat(product.rating || "0")} size="sm" />
+            <StarRating
+              value={parseFloat(product.averageRating || "0")}
+              size="sm"
+            />
             <span className="text-gray-600 text-sm" data-testid={`product-review-count-${product.id}`}>
-              ({product.reviewCount || 0})
+              ({product.reviewsCount || 0})
             </span>
           </div>
         </div>

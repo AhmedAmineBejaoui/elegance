@@ -34,8 +34,8 @@ async function seed() {
       tags: ["soirée", "élégant"],
       shortDescription: "Une robe idéale pour les occasions spéciales.",
       description: "Cette robe élégante offre une coupe flatteuse et un tissu de qualité supérieure.",
-      rating: "4.5",
-      reviewCount: 12,
+      averageRating: "4.5",
+      reviewsCount: 12,
     });
 
     console.log("✅ Seed terminé avec succès");
