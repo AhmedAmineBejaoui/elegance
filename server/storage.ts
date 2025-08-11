@@ -157,7 +157,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCategory(category: InsertCategory): Promise<Category> {
-    const [newCategory] = await db.insert(categories).values(category).returning();
+    const [newCategory] = (await db
+      .insert(categories)
+      .values(category)
+      .returning()) as Category[];
     return newCategory;
   }
 
@@ -413,8 +416,8 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(products)
       .set({
-        rating: stats.avg ? stats.avg.toFixed(2) : "0",
-        reviewCount: stats.count,
+        averageRating: stats.avg ? stats.avg.toFixed(2) : "0",
+        reviewsCount: stats.count,
       })
       .where(eq(products.id, review.productId));
 
