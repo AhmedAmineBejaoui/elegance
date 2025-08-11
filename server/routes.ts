@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./auth";
 import paymentRouter from "./payments";
+import contactRouter from "./routes/contact";
 import { insertProductSchema, insertCategorySchema, insertOrderSchema, insertCartItemSchema, insertReviewSchema, insertNewsletterSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -34,6 +35,9 @@ app.get("/api/auth/user", (req, res) => {
 
   // Payment routes
   app.use("/api/payments", isAuthenticated, paymentRouter);
+
+  // Contact form route
+  app.use("/api/contact", contactRouter);
 
   // Newsletter subscription route
   app.post('/api/newsletter', async (req, res) => {
