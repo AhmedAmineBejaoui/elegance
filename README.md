@@ -94,6 +94,12 @@ Create a `.env` file in the root directory with the following variables:
 ```env
 DATABASE_URL=postgres://username:password@localhost:5432/tunisianchic
 STRIPE_SECRET_KEY=your_stripe_secret_key
+# SMTP configuration for contact form
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=your_smtp_user
+SMTP_PASS=your_smtp_password
+CONTACT_RECIPIENT=contact@example.com
 ```
 
 4. Run migrations
