@@ -116,15 +116,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
+    // We upsert on the email field to avoid creating duplicate users when the
+    // same person signs in with Google after registering with email/password.
+    // The primary key (id) should remain stable, so we exclude it from the
+    // update set in case of conflict.
+    const updateData = { ...userData, updatedAt: new Date() } as any;
+    delete updateData.id;
+
     const [user] = await db
       .insert(users)
       .values(userData)
       .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
+        target: users.email,
+        set: updateData,
       })
       .returning();
     return user;
