@@ -24,6 +24,11 @@ export default function Cart() {
     enabled: isAuthenticated,
   });
 
+  const { data: newsletterStatus } = useQuery({
+    queryKey: ["/api/newsletter/status"],
+    enabled: isAuthenticated,
+  });
+
   const updateQuantityMutation = useMutation({
     mutationFn: async ({ id, quantity }: { id: number; quantity: number }) => {
       await apiRequest("PUT", `/api/cart/${id}`, { quantity });
@@ -159,7 +164,8 @@ export default function Cart() {
 
   const shipping = subtotal >= 150 ? 0 : 7; // Free shipping over 150 DT
   const tax = subtotal * 0.19; // 19% VAT
-  const total = subtotal + shipping + tax;
+  const discount = newsletterStatus?.discountAvailable ? subtotal * 0.1 : 0;
+  const total = subtotal + shipping + tax - discount;
 
   return (
     <div className="min-h-screen">
@@ -326,9 +332,16 @@ export default function Cart() {
                     <span>TVA (19%)</span>
                     <span data-testid="cart-tax">{tax.toFixed(2)} DT</span>
                   </div>
-                  
+
+                  {discount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Réduction newsletter</span>
+                      <span data-testid="cart-discount">-{discount.toFixed(2)} DT</span>
+                    </div>
+                  )}
+
                   <Separator />
-                  
+
                   <div className="flex justify-between text-lg font-semibold">
                     <span>Total</span>
                     <span className="text-primary" data-testid="cart-total">

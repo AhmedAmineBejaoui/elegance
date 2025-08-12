@@ -23,7 +23,6 @@ import {
   type Review,
   type InsertReview,
   type NewsletterSubscription,
-  type InsertNewsletterSubscription,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, like, inArray, sql } from "drizzle-orm";
@@ -64,7 +63,7 @@ export interface IStorage {
   getOrderById(id: number): Promise<Order | undefined>;
   getOrderWithItems(id: number): Promise<(Order & { items: (OrderItem & { product: Product })[] }) | undefined>;
   getUserOrdersWithItems(userId: string): Promise<(Order & { items: (OrderItem & { product: Product })[] })[]>;
-  createOrder(order: InsertOrder): Promise<Order>;
+  createOrder(order: InsertOrder, userEmail?: string): Promise<Order>;
   updateOrder(id: number, order: Partial<InsertOrder>): Promise<Order>;
   addOrderItem(item: InsertOrderItem): Promise<OrderItem>;
 
@@ -80,7 +79,13 @@ export interface IStorage {
   createReview(review: InsertReview): Promise<Review>;
 
   // Newsletter operations
-  createNewsletterSubscription(sub: InsertNewsletterSubscription): Promise<NewsletterSubscription>;
+  createNewsletterSubscription(email: string): Promise<{
+    created: boolean;
+    alreadyExists: boolean;
+  }>;
+  getNewsletterSubscription(
+    email: string,
+  ): Promise<NewsletterSubscription | undefined>;
 
   // Admin operations
   getOrderStats(): Promise<{
@@ -307,9 +312,17 @@ export class DatabaseStorage implements IStorage {
     return ordersWithItems;
   }
 
-  async createOrder(order: InsertOrder): Promise<Order> {
-    const [newOrder] = await db.insert(orders).values(order).returning();
-    return newOrder;
+  async createOrder(order: InsertOrder, userEmail?: string): Promise<Order> {
+    return db.transaction(async tx => {
+      const [newOrder] = await tx.insert(orders).values(order).returning();
+      if (userEmail && Number(order.discount) > 0) {
+        await tx
+          .update(newsletterSubscriptions)
+          .set({ discountUsed: true })
+          .where(sql`lower(${newsletterSubscriptions.email}) = ${userEmail.toLowerCase()}`);
+      }
+      return newOrder;
+    });
   }
 
   async updateOrder(id: number, order: Partial<InsertOrder>): Promise<Order> {
@@ -424,21 +437,36 @@ export class DatabaseStorage implements IStorage {
     return newReview;
   }
 
-  async createNewsletterSubscription(sub: InsertNewsletterSubscription): Promise<NewsletterSubscription> {
-    const [subscription] = await db
+  async createNewsletterSubscription(email: string): Promise<{
+    created: boolean;
+    alreadyExists: boolean;
+  }> {
+    const [inserted] = await db
       .insert(newsletterSubscriptions)
-      .values(sub)
+      .values({ email, discountUsed: false })
       .onConflictDoNothing()
-      .returning();
+      .returning({ id: newsletterSubscriptions.id });
 
-    if (subscription) return subscription;
+    if (inserted) {
+      return { created: true, alreadyExists: false };
+    }
 
     const [existing] = await db
+      .select({ id: newsletterSubscriptions.id })
+      .from(newsletterSubscriptions)
+      .where(sql`lower(${newsletterSubscriptions.email}) = ${email.toLowerCase()}`);
+
+    return { created: false, alreadyExists: !!existing };
+  }
+
+  async getNewsletterSubscription(
+    email: string,
+  ): Promise<NewsletterSubscription | undefined> {
+    const [subscription] = await db
       .select()
       .from(newsletterSubscriptions)
-      .where(eq(newsletterSubscriptions.email, sub.email));
-
-    return existing!;
+      .where(sql`lower(${newsletterSubscriptions.email}) = ${email.toLowerCase()}`);
+    return subscription;
   }
 
   // Admin operations

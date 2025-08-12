@@ -65,6 +65,11 @@ export default function Checkout() {
     enabled: isAuthenticated,
   });
 
+  const { data: newsletterStatus } = useQuery({
+    queryKey: ["/api/newsletter/status"],
+    enabled: isAuthenticated,
+  });
+
   const createOrderMutation = useMutation({
     mutationFn: async (orderData: any) => {
       const response = await apiRequest("POST", "/api/orders", orderData);
@@ -146,7 +151,8 @@ export default function Checkout() {
 
   const shipping = subtotal >= 150 ? 0 : 7;
   const tax = subtotal * 0.19;
-  const total = subtotal + shipping + tax;
+  const discount = newsletterStatus?.discountAvailable ? subtotal * 0.1 : 0;
+  const total = subtotal + shipping + tax - discount;
 
   const handleAddressChange = (field: keyof ShippingAddress, value: string, isShipping = true) => {
     if (isShipping) {
@@ -201,6 +207,7 @@ export default function Checkout() {
       subtotal: subtotal.toFixed(2),
       tax: tax.toFixed(2),
       shipping: shipping.toFixed(2),
+      discount: discount.toFixed(2),
       shippingAddress,
       billingAddress: sameAsBilling ? shippingAddress : billingAddress,
       paymentMethod,
@@ -562,9 +569,16 @@ export default function Checkout() {
                   <span>TVA (19%)</span>
                   <span data-testid="summary-tax">{tax.toFixed(2)} DT</span>
                 </div>
-                
+
+                {discount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Réduction newsletter</span>
+                    <span data-testid="summary-discount">-{discount.toFixed(2)} DT</span>
+                  </div>
+                )}
+
                 <Separator />
-                
+
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
                   <span className="text-primary" data-testid="summary-total">
