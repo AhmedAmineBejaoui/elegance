@@ -143,6 +143,9 @@ export const orders = pgTable(
     shipping: numeric("shipping", { precision: 10, scale: 2 })
       .notNull()
       .default("0"),
+    discount: numeric("discount", { precision: 10, scale: 2 })
+      .notNull()
+      .default("0"),
 
     shippingAddress: jsonb("shipping_address").notNull(),
     billingAddress: jsonb("billing_address"),
@@ -244,6 +247,7 @@ export const newsletterSubscriptions = pgTable(
     id: serial("id").primaryKey(),
     email: varchar("email", { length: 255 }).notNull().unique(),
     createdAt: timestamp("created_at", { withTimezone: false }).defaultNow(),
+    discountUsed: boolean("discount_used").notNull().default(false),
   },
 );
 
@@ -368,6 +372,7 @@ export const insertNewsletterSchema = createInsertSchema(
 ).omit({
   id: true,
   createdAt: true,
+  discountUsed: true,
 });
 
 /* ---------------------------------- Types ---------------------------------- */

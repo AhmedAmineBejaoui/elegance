@@ -80,7 +80,11 @@ export interface IStorage {
   createReview(review: InsertReview): Promise<Review>;
 
   // Newsletter operations
-  createNewsletterSubscription(sub: InsertNewsletterSubscription): Promise<NewsletterSubscription>;
+  createNewsletterSubscription(
+    sub: InsertNewsletterSubscription,
+  ): Promise<{ subscription: NewsletterSubscription; isNew: boolean }>;
+  getNewsletterSubscription(email: string): Promise<NewsletterSubscription | undefined>;
+  markNewsletterDiscountUsed(email: string): Promise<void>;
 
   // Admin operations
   getOrderStats(): Promise<{
@@ -424,21 +428,42 @@ export class DatabaseStorage implements IStorage {
     return newReview;
   }
 
-  async createNewsletterSubscription(sub: InsertNewsletterSubscription): Promise<NewsletterSubscription> {
+  async createNewsletterSubscription(
+    sub: InsertNewsletterSubscription,
+  ): Promise<{ subscription: NewsletterSubscription; isNew: boolean }> {
     const [subscription] = await db
       .insert(newsletterSubscriptions)
       .values(sub)
       .onConflictDoNothing()
       .returning();
 
-    if (subscription) return subscription;
+    if (subscription) {
+      return { subscription, isNew: true };
+    }
 
     const [existing] = await db
       .select()
       .from(newsletterSubscriptions)
       .where(eq(newsletterSubscriptions.email, sub.email));
 
-    return existing!;
+    return { subscription: existing!, isNew: false };
+  }
+
+  async getNewsletterSubscription(
+    email: string,
+  ): Promise<NewsletterSubscription | undefined> {
+    const [subscription] = await db
+      .select()
+      .from(newsletterSubscriptions)
+      .where(eq(newsletterSubscriptions.email, email));
+    return subscription;
+  }
+
+  async markNewsletterDiscountUsed(email: string): Promise<void> {
+    await db
+      .update(newsletterSubscriptions)
+      .set({ discountUsed: true })
+      .where(eq(newsletterSubscriptions.email, email));
   }
 
   // Admin operations
