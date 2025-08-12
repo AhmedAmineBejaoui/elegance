@@ -21,15 +21,20 @@
       "version": "7",
       "when": 1755016789000,
       "tag": "0002_newsletter_discount",
-
       "breakpoints": true
-    }
-    ,{
+    },
+    {
       "idx": 3,
       "version": "7",
       "when": 1755017883000,
       "tag": "0003_add_discount_used",
-
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1755025705870,
+      "tag": "0004_flowery_tarantula",
       "breakpoints": true
     }
   ]
