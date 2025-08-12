@@ -60,19 +60,22 @@ export async function setupAuth(app: Express): Promise<void> {
         clientSecret: GOOGLE_CLIENT_SECRET,
         callbackURL,
       },
-      async (_accessToken, _refreshToken, profile, done) => {
-        const userData = {
-          id: profile.id,
-          email: profile.emails?.[0]?.value || "",
-          firstName: profile.name?.givenName,
-          lastName: profile.name?.familyName,
-          profileImageUrl: profile.photos?.[0]?.value,
-        };
-        const fullUser = await storage.upsertUser(userData); // <- assure-toi que ça retourne le role aussi
-        done(null, fullUser);
-      }
-    )
-  );
+        async (_accessToken, _refreshToken, profile, done) => {
+          const email = profile.emails?.[0]?.value;
+          if (!email) {
+            return done(new Error("Google account has no email"));
+          }
+          const userData = {
+            email,
+            firstName: profile.name?.givenName,
+            lastName: profile.name?.familyName,
+            profileImageUrl: profile.photos?.[0]?.value,
+          };
+          const fullUser = await storage.upsertUser(userData); // <- assure-toi que ça retourne le role aussi
+          done(null, fullUser);
+        }
+      )
+    );
 
   passport.use(
     new LocalStrategy({ usernameField: "email" }, async (email, password, done) => {
