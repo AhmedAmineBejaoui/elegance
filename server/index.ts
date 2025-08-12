@@ -61,7 +61,7 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // ❌ Gestion des erreurs globales
+  // Gestion des erreurs globales
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     if (err.code === "LIMIT_FILE_SIZE") {
       return res.status(413).json({ message: "Fichier trop volumineux (max 10MB)" });
