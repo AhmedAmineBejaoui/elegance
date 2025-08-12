@@ -6,13 +6,15 @@ const router = Router();
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT) || 587,
-  secure: false,
-  auth: process.env.SMTP_USER
-    ? {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      }
-    : undefined,
+  // Utilise une connexion sécurisée si le port 465 est utilisé (SMTPs)
+  secure: Number(process.env.SMTP_PORT) === 465,
+  auth:
+    process.env.SMTP_USER && process.env.SMTP_PASS
+      ? {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        }
+      : undefined,
 });
 
 router.post("/", async (req, res) => {
@@ -28,8 +30,11 @@ router.post("/", async (req, res) => {
 
   try {
     await transporter.sendMail({
-      from: email,
-      to: process.env.CONTACT_EMAIL || process.env.SMTP_USER || "",
+      // Expéditeur : adresse SMTP authentifiée
+      from: process.env.SMTP_FROM || process.env.SMTP_USER || email,
+      // Destinataire : adresse de contact configurée
+      to: process.env.CONTACT_TO || process.env.SMTP_USER || "",
+      replyTo: email,
       subject: `Contact form submission from ${name}`,
       text: message,
     });
