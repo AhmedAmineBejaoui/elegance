@@ -31,7 +31,7 @@ export function Footer() {
       }
       if (!res.ok) throw new Error(data.message || "Une erreur s'est produite");
       setStatus("success");
-      setMessage("Merci pour votre inscription !");
+      setMessage(data.message || "Merci pour votre inscription !");
       setEmail("");
       queryClient.invalidateQueries({ queryKey: ["/api/newsletter/status"] });
     } catch (err: any) {
