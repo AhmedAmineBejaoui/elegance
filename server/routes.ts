@@ -43,11 +43,35 @@ app.get("/api/auth/user", (req, res) => {
   app.post('/api/newsletter', async (req, res) => {
     try {
       const data = insertNewsletterSchema.parse(req.body);
-      const subscription = await storage.createNewsletterSubscription(data);
+      const { subscription, isNew } = await storage.createNewsletterSubscription(data);
+      if (!isNew) {
+        return res.status(409).json({ message: 'Cet email est déjà inscrit à la newsletter' });
+      }
       res.json(subscription);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Adresse email invalide' });
+      }
       console.error('Error subscribing to newsletter:', error);
       res.status(500).json({ message: 'Failed to subscribe to newsletter' });
+    }
+  });
+
+  // Newsletter status route
+  app.get('/api/newsletter/status', isAuthenticated, async (req: any, res) => {
+    try {
+      const user = await storage.getUser(req.user.id);
+      if (!user?.email) {
+        return res.json({ subscribed: false, discountAvailable: false });
+      }
+      const sub = await storage.getNewsletterSubscription(user.email);
+      res.json({
+        subscribed: !!sub,
+        discountAvailable: !!sub && !sub.discountUsed,
+      });
+    } catch (error) {
+      console.error('Error fetching newsletter status:', error);
+      res.status(500).json({ message: 'Failed to fetch newsletter status' });
     }
   });
 
@@ -378,7 +402,26 @@ app.get("/api/auth/user", (req, res) => {
     try {
       const userId = req.user.id;
       const orderData = insertOrderSchema.parse({ ...req.body, userId });
+      const user = await storage.getUser(userId);
+      const subtotal = parseFloat(orderData.subtotal as any);
+      const tax = parseFloat(orderData.tax as any);
+      const shipping = parseFloat(orderData.shipping as any);
+      let discount = 0;
+      if (user?.email) {
+        const sub = await storage.getNewsletterSubscription(user.email);
+        if (sub && !sub.discountUsed) {
+          discount = subtotal * 0.1;
+        }
+      }
+      orderData.discount = discount.toFixed(2) as any;
+      orderData.total = (subtotal + tax + shipping - discount).toFixed(2) as any;
+
       const order = await storage.createOrder(orderData);
+
+      if (discount > 0 && user?.email) {
+        await storage.markNewsletterDiscountUsed(user.email);
+      }
+
       res.json(order);
     } catch (error) {
       console.error("Error creating order:", error);

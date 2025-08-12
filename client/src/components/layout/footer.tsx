@@ -4,14 +4,21 @@ import { Lock, Truck, RotateCcw, Headphones, Instagram, Facebook } from "lucide-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function Footer() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setStatus("error");
+      setMessage("Adresse email invalide");
+      return;
+    }
     try {
       const res = await fetch("/api/newsletter", {
         method: "POST",
@@ -19,10 +26,14 @@ export function Footer() {
         body: JSON.stringify({ email }),
       });
       const data = await res.json();
+      if (res.status === 409) {
+        throw new Error(data.message || "Cet email est déjà inscrit");
+      }
       if (!res.ok) throw new Error(data.message || "Une erreur s'est produite");
       setStatus("success");
       setMessage("Merci pour votre inscription !");
       setEmail("");
+      queryClient.invalidateQueries({ queryKey: ["/api/newsletter/status"] });
     } catch (err: any) {
       setStatus("error");
       setMessage(err.message || "Une erreur s'est produite");
