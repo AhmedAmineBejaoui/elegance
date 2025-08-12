@@ -30,9 +30,14 @@ router.post("/", async (req, res) => {
       return res.status(200).json({ message: "Message sent" });
     }
 
-    const to = process.env.CONTACT_RECIPIENT || process.env.SMTP_USER;
+    const to =
+      process.env.CONTACT_RECIPIENT ||
+      process.env.CONTACT_TO ||
+      process.env.SMTP_USER;
     if (!to) {
-      throw new Error("Missing CONTACT_RECIPIENT or SMTP_USER env variable");
+      throw new Error(
+        "Missing CONTACT_RECIPIENT/CONTACT_TO or SMTP_USER env variable"
+      );
     }
 
     const date = new Date().toLocaleString();
