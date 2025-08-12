@@ -52,6 +52,7 @@ export async function setupAuth(app: Express): Promise<void> {
   app.use(passport.session());
 
   const callbackURL = new URL(GOOGLE_CALLBACK_PATH, PUBLIC_BASE_URL).toString();
+  const callbackPath = new URL(callbackURL).pathname;
 
   passport.use(
     new GoogleStrategy(
@@ -101,7 +102,7 @@ export async function setupAuth(app: Express): Promise<void> {
   app.get("/api/login", passport.authenticate("google", { scope: ["profile", "email"] }));
 
   app.get(
-    GOOGLE_CALLBACK_PATH,
+    callbackPath,
     passport.authenticate("google", {
       successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
@@ -159,7 +160,7 @@ export async function setupAuth(app: Express): Promise<void> {
   app.post("/api/logout", logoutHandler);
   app.get("/api/logout", logoutHandler);
 
-  console.log(`[auth] Google OAuth prêt (callback: ${callbackURL})`);
+    console.log(`[auth] Google OAuth prêt (callback: ${callbackURL})`);
 }
 
 export const isAuthenticated: RequestHandler = (req, res, next) => {
