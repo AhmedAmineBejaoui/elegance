@@ -26,6 +26,9 @@ export function Footer() {
         body: JSON.stringify({ email }),
       });
       const data = await res.json();
+      if (res.status === 409) {
+        throw new Error(data.message || "Cet email est déjà inscrit");
+      }
       if (!res.ok) throw new Error(data.message || "Une erreur s'est produite");
       setStatus("success");
       setMessage(data.message || "Merci pour votre inscription !");

@@ -21,6 +21,7 @@
       "version": "7",
       "when": 1755016789000,
       "tag": "0002_newsletter_discount",
+
       "breakpoints": true
     }
     ,{
@@ -28,6 +29,7 @@
       "version": "7",
       "when": 1755017883000,
       "tag": "0003_add_discount_used",
+
       "breakpoints": true
     }
   ]

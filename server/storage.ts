@@ -79,6 +79,7 @@ export interface IStorage {
   createReview(review: InsertReview): Promise<Review>;
 
   // Newsletter operations
+
   createNewsletterSubscription(email: string): Promise<{
     created: boolean;
     alreadyExists: boolean;
@@ -86,6 +87,7 @@ export interface IStorage {
   getNewsletterSubscription(
     email: string,
   ): Promise<NewsletterSubscription | undefined>;
+
 
   // Admin operations
   getOrderStats(): Promise<{
@@ -442,6 +444,7 @@ export class DatabaseStorage implements IStorage {
     alreadyExists: boolean;
   }> {
     const [inserted] = await db
+
       .insert(newsletterSubscriptions)
       .values({ email, discountUsed: false })
       .onConflictDoNothing()
@@ -449,6 +452,7 @@ export class DatabaseStorage implements IStorage {
 
     if (inserted) {
       return { created: true, alreadyExists: false };
+
     }
 
     const [existing] = await db
@@ -459,14 +463,17 @@ export class DatabaseStorage implements IStorage {
     return { created: false, alreadyExists: !!existing };
   }
 
+
   async getNewsletterSubscription(
     email: string,
   ): Promise<NewsletterSubscription | undefined> {
     const [subscription] = await db
       .select()
       .from(newsletterSubscriptions)
+
       .where(sql`lower(${newsletterSubscriptions.email}) = ${email.toLowerCase()}`);
     return subscription;
+
   }
 
   // Admin operations
