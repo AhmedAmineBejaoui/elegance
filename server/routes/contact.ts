@@ -35,11 +35,18 @@ router.post("/", async (req, res) => {
       throw new Error("Missing CONTACT_RECIPIENT or SMTP_USER env variable");
     }
 
+    const date = new Date().toLocaleString();
+
     await transporter.sendMail({
       from: `${data.name} <${data.email}>`,
       to,
-      subject: "New contact message",
-      text: data.message,
+      subject: `New contact message from ${data.email}`,
+      text: `Name: ${data.name}\nEmail: ${data.email}\nDate: ${date}\n\n${data.message}`,
+      html: `<p><strong>Name:</strong> ${data.name}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Date:</strong> ${date}</p>
+            <p><strong>Message:</strong></p>
+            <p>${data.message}</p>`,
       replyTo: data.email,
     });
 
