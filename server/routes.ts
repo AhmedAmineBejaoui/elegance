@@ -326,6 +326,9 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
       const product = await storage.createProduct(productData);
       res.json(product);
     } catch (error) {
+      if ((error as any).code === '23505' && (error as any).constraint === 'products_sku_unique') {
+        return res.status(409).json({ message: 'SKU déjà utilisé' });
+      }
       console.error("Error creating product:", error);
       res.status(500).json({ message: "Failed to create product" });
     }
@@ -342,6 +345,9 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
       const product = await storage.updateProduct(id, productData);
       res.json(product);
     } catch (error) {
+      if ((error as any).code === '23505' && (error as any).constraint === 'products_sku_unique') {
+        return res.status(409).json({ message: 'SKU déjà utilisé' });
+      }
       console.error("Error updating product:", error);
       res.status(500).json({ message: "Failed to update product" });
     }
@@ -421,6 +427,7 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
   // ------ Orders
   app.get('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
+      res.set('Cache-Control', 'no-store');
       const user = await storage.getUser(req.user.id);
       const userId = user?.role === 'admin' ? undefined : req.user.id;
       const orders = await storage.getOrders(userId);
@@ -428,6 +435,27 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
     } catch (error) {
       console.error("Error fetching orders:", error);
       res.status(500).json({ message: "Failed to fetch orders" });
+    }
+  });
+
+  app.put('/api/orders/:id', isAuthenticated, requireAdmin, async (req: any, res) => {
+    try {
+      res.set('Cache-Control', 'no-store');
+      const paramsSchema = z.object({ id: z.coerce.number().int() });
+      const bodySchema = z.object({ status: z.string() });
+      const { id } = paramsSchema.parse(req.params);
+      const { status } = bodySchema.parse(req.body);
+      const order = await storage.updateOrder(id, { status });
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+      return res.json(order);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid input' });
+      }
+      console.error('Error updating order:', error);
+      return res.status(500).json({ message: 'Failed to update order' });
     }
   });
 

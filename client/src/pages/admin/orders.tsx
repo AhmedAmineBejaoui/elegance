@@ -48,10 +48,18 @@ export default function AdminOrders() {
 
   const updateOrderMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      await apiRequest("PUT", `/api/orders/${id}`, { status });
+      const res = await apiRequest("PUT", `/api/orders/${id}`, { status });
+      return await res.json();
     },
-    onSuccess: () => {
+    onSuccess: (updatedOrder: any) => {
+      queryClient.setQueryData(["/api/orders"], (old: any = []) =>
+        old.map((o: any) => (o.id === updatedOrder.id ? { ...o, status: updatedOrder.status } : o)),
+      );
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/orders", updatedOrder.id] });
+      setSelectedOrder((prev: any) =>
+        prev?.id === updatedOrder.id ? { ...prev, status: updatedOrder.status } : prev,
+      );
       toast({
         title: "Commande mise à jour",
         description: "Le statut de la commande a été mis à jour avec succès.",
