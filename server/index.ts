@@ -6,6 +6,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import multer from "multer";
 
 const app = express();
+app.set("etag", false);
 
 // Middleware global (désactive l'avertissement sur toutes les routes)
 app.use((req, res, next) => {

@@ -127,13 +127,13 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
       if (!order || order.userId !== req.user.id) {
         return res.status(404).json({ message: "Order not found" });
       }
-
+      const user = await storage.getUser(order.userId);
       const createdAt = order.createdAt
         ? new Date(order.createdAt).toLocaleDateString('fr-FR')
         : '';
 
       const PDFDocument = (await import('pdfkit')).default;
-      const doc = new PDFDocument();
+      const doc = new PDFDocument({ margin: 50 });
       const chunks: Buffer[] = [];
 
       doc.on('data', (chunk) => chunks.push(chunk));
@@ -144,14 +144,58 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
         res.send(pdf);
       });
 
-      doc.fontSize(20).text(`Facture - Commande #${order.id}`);
-      doc.text(`Date: ${createdAt}`);
+      const siteName = 'Tunisian Chic';
+      const siteUrl = process.env.PUBLIC_BASE_URL ?? '';
+
+      // Header
+      doc.fontSize(20).text(siteName, { align: 'center' });
+      if (siteUrl) doc.fontSize(10).text(siteUrl, { align: 'center' });
       doc.moveDown();
+
+      doc.fontSize(16).text(`Facture - Commande #${order.id}`);
+      doc.fontSize(12).text(`Date: ${createdAt}`);
+      doc.moveDown();
+
+      // Customer details
+      doc.text(`Nom: ${(user?.firstName ?? '')} ${(user?.lastName ?? '')}`);
+      if (user?.email) doc.text(`Email: ${user.email}`);
+      const addr = order.shippingAddress as any;
+      if (addr) {
+        if (addr.address) doc.text(`Adresse: ${addr.address}`);
+        if (addr.city || addr.postalCode) {
+          doc.text(`Ville: ${addr.city ?? ''} ${addr.postalCode ?? ''}`);
+        }
+        if (addr.phone) doc.text(`Téléphone: ${addr.phone}`);
+      }
+      doc.moveDown();
+
+      // Table header
+      const tableTop = doc.y;
+      const productX = 50;
+      const qtyX = 300;
+      const priceX = 370;
+      const totalX = 450;
+
+      doc.fontSize(12).text('Produit', productX, tableTop);
+      doc.text('Quantité', qtyX, tableTop);
+      doc.text('Prix', priceX, tableTop);
+      doc.text('Total', totalX, tableTop);
+      doc.moveTo(productX, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+
+      let y = tableTop + 25;
       order.items.forEach((item: any) => {
-        doc.text(`${item.product.name} x${item.quantity} - ${item.price} DT`);
+        const lineTotal = (Number(item.price) * item.quantity).toFixed(2);
+        doc.text(item.product.name, productX, y, { width: qtyX - productX - 10 });
+        doc.text(String(item.quantity), qtyX, y);
+        doc.text(`${item.price} DT`, priceX, y);
+        doc.text(`${lineTotal} DT`, totalX, y);
+        y += 20;
       });
+
+      doc.moveTo(productX, y).lineTo(550, y).stroke();
       doc.moveDown();
-      doc.text(`Total: ${order.total} DT`);
+
+      doc.fontSize(12).text(`Total: ${order.total} DT`, { align: 'right' });
       doc.end();
     } catch (error) {
       console.error('Error generating invoice:', error);
@@ -282,6 +326,9 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
       const product = await storage.createProduct(productData);
       res.json(product);
     } catch (error) {
+      if ((error as any).code === '23505' && (error as any).constraint === 'products_sku_unique') {
+        return res.status(409).json({ message: 'SKU déjà utilisé' });
+      }
       console.error("Error creating product:", error);
       res.status(500).json({ message: "Failed to create product" });
     }
@@ -298,6 +345,9 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
       const product = await storage.updateProduct(id, productData);
       res.json(product);
     } catch (error) {
+      if ((error as any).code === '23505' && (error as any).constraint === 'products_sku_unique') {
+        return res.status(409).json({ message: 'SKU déjà utilisé' });
+      }
       console.error("Error updating product:", error);
       res.status(500).json({ message: "Failed to update product" });
     }
@@ -377,6 +427,7 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
   // ------ Orders
   app.get('/api/orders', isAuthenticated, async (req: any, res) => {
     try {
+      res.set('Cache-Control', 'no-store');
       const user = await storage.getUser(req.user.id);
       const userId = user?.role === 'admin' ? undefined : req.user.id;
       const orders = await storage.getOrders(userId);
@@ -384,6 +435,27 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
     } catch (error) {
       console.error("Error fetching orders:", error);
       res.status(500).json({ message: "Failed to fetch orders" });
+    }
+  });
+
+  app.put('/api/orders/:id', isAuthenticated, requireAdmin, async (req: any, res) => {
+    try {
+      res.set('Cache-Control', 'no-store');
+      const paramsSchema = z.object({ id: z.coerce.number().int() });
+      const bodySchema = z.object({ status: z.string() });
+      const { id } = paramsSchema.parse(req.params);
+      const { status } = bodySchema.parse(req.body);
+      const order = await storage.updateOrder(id, { status });
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+      return res.json(order);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid input' });
+      }
+      console.error('Error updating order:', error);
+      return res.status(500).json({ message: 'Failed to update order' });
     }
   });
 
@@ -408,7 +480,7 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
       orderData.discount = Number(discount.toFixed(2)) as any;
       orderData.total = Number((subtotal + tax + shipping - discount).toFixed(2)) as any;
 
-      const order = await storage.createOrder(orderData, user?.email);
+        const order = await storage.createOrder(orderData, user?.email ?? undefined);
       res.json(order);
     } catch (error) {
       console.error("Error creating order:", error);
