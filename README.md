@@ -94,6 +94,11 @@ Create a `.env` file in the root directory with the following variables:
 ```env
 DATABASE_URL=postgres://username:password@localhost:5432/tunisianchic
 STRIPE_SECRET_KEY=your_stripe_secret_key
+SESSION_SECRET=changeme
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+PUBLIC_BASE_URL=http://localhost:5000
+GOOGLE_CALLBACK_PATH=/api/callback
 # SMTP configuration for contact form
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587

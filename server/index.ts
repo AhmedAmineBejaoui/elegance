@@ -84,6 +84,4 @@ app.use((req, res, next) => {
   server.listen(port, "0.0.0.0", () => {
     log(`✨ Server running on http://localhost:${port}`);
   });
-  console.log("[auth] CLIENT_ID =", (process.env.GOOGLE_CLIENT_ID || "").slice(0, 16) + "…");
-
 })();

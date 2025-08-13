@@ -37,8 +37,13 @@ export async function setupAuth(app: Express): Promise<void> {
     NODE_ENV,
   } = process.env;
 
-  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
-    throw new Error("Google OAuth: GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET doivent être définis dans .env");
+  const clientID = (GOOGLE_CLIENT_ID || "").trim();
+  const clientSecret = (GOOGLE_CLIENT_SECRET || "").trim();
+
+  if (!clientID || !clientSecret) {
+    throw new Error(
+      "Google OAuth: GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET doivent être définis dans .env"
+    );
   }
 
   const base = sanitizeBaseUrl(PUBLIC_BASE_URL);
@@ -85,8 +90,8 @@ export async function setupAuth(app: Express): Promise<void> {
   passport.use(
     new GoogleStrategy(
       {
-        clientID: GOOGLE_CLIENT_ID,
-        clientSecret: GOOGLE_CLIENT_SECRET,
+        clientID,
+        clientSecret,
         callbackURL: callbackUrlString,
       },
       async (_accessToken, _refreshToken, profile, done) => {
