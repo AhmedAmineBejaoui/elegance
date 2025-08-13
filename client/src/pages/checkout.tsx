@@ -65,7 +65,7 @@ export default function Checkout() {
     enabled: isAuthenticated,
   });
 
-  const { data: newsletterStatus } = useQuery({
+  const { data: newsletterStatus } = useQuery<{ subscribed: boolean; discountAvailable: boolean }>({
     queryKey: ["/api/newsletter/status"],
     enabled: isAuthenticated,
   });
