@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Link } from "wouter";
+import { API_BASE } from "@/lib/api";
 
 export default function AdminOrders() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -65,7 +66,7 @@ export default function AdminOrders() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -200,7 +201,7 @@ export default function AdminOrders() {
                 <Button asChild variant="outline">
                   <Link href="/">Voir le site</Link>
                 </Button>
-                <Button onClick={() => window.location.href = "/api/logout"} variant="outline">
+                <Button onClick={() => (window.location.href = `${API_BASE}/api/logout`)} variant="outline">
                   Déconnexion
                 </Button>
               </div>

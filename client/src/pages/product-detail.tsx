@@ -32,6 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { useFavorites } from "@/hooks/useFavorites";
+import { API_BASE } from "@/lib/api";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/products/:slug");
@@ -91,7 +92,7 @@ export default function ProductDetail() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -141,7 +142,7 @@ export default function ProductDetail() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }

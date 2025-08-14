@@ -20,6 +20,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Link } from "wouter";
 import type { Category, InsertCategory } from "@shared/schema";
+import { API_BASE } from "@/lib/api";
 
 interface CategoryFormData {
   name: string;
@@ -78,7 +79,7 @@ export default function AdminCategories() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
       } else {
         toast({
@@ -109,7 +110,7 @@ export default function AdminCategories() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
       } else {
         toast({
