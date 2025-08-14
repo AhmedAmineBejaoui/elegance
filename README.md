@@ -119,6 +119,17 @@ npx drizzle-kit push
 npm run dev
 ```
 
+## Production
+
+To build and run the application in production:
+
+```bash
+npm run build
+npm start
+```
+
+The Express server automatically listens on the port provided via `PORT` and serves the Vite build output from `dist/public`. A basic health check is exposed at `/api/health`.
+
 ## API Endpoints
 
 ### Authentication
