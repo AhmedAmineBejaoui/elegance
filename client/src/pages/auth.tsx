@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
 import { useForm } from "react-hook-form";
+import { API_BASE } from "@/lib/api";
 
 export default function AuthPage() {
   const { isAuthenticated } = useAuth();
@@ -26,7 +27,7 @@ export default function AuthPage() {
 
   const onSubmit = async (data: any) => {
     const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register";
-    const res = await fetch(endpoint, {
+    const res = await fetch(`${API_BASE}${endpoint}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -125,7 +126,7 @@ export default function AuthPage() {
 
           <div className="space-y-3">
             <Button
-              onClick={() => (window.location.href = "/api/login")}
+              onClick={() => (window.location.href = `${API_BASE}/api/login`)}
               variant="outline"
               className="w-full h-12 border-gray-200 hover:bg-gray-50"
             >

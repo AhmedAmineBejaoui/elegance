@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
+import { API_BASE } from "@/lib/api";
 import { CartModal } from "@/components/cart/cart-modal";
 import type { CartItem, Product } from "@shared/schema";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -206,7 +207,7 @@ export function Header() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       className="cursor-pointer"
-                      onClick={() => window.location.href = "/api/logout"}
+                      onClick={() => (window.location.href = `${API_BASE}/api/logout`)}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Déconnexion</span>

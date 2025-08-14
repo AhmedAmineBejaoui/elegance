@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
+import { API_BASE } from "@/lib/api";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -126,7 +127,7 @@ export default function ProfilePage() {
               <h1 className="text-3xl font-bold text-gray-900">Mon Profil</h1>
               <p className="text-gray-600">Gérez vos informations personnelles et commandes</p>
             </div>
-            <Button onClick={() => window.location.href = "/api/logout"} variant="outline">
+            <Button onClick={() => (window.location.href = `${API_BASE}/api/logout`)} variant="outline">
               Déconnexion
             </Button>
           </div>
@@ -381,7 +382,7 @@ export default function ProfilePage() {
                         <p className="text-sm text-gray-600 mb-3">
                           Gérez vos données personnelles et vos préférences de confidentialité.
                         </p>
-                        <Button variant="outline" onClick={() => window.location.href = "/api/logout"}>
+                        <Button variant="outline" onClick={() => (window.location.href = `${API_BASE}/api/logout`)}>
                           Se déconnecter
                         </Button>
                       </div>

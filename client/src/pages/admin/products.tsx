@@ -30,6 +30,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Link } from "wouter";
 import type { Product, Category } from "@shared/schema";
+import { API_BASE } from "@/lib/api";
 
 interface ProductFormData {
   name: string;
@@ -124,7 +125,7 @@ export default function AdminProducts() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -157,7 +158,7 @@ export default function AdminProducts() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -188,7 +189,7 @@ export default function AdminProducts() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }

@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Link } from "wouter";
+import { API_BASE } from "@/lib/api";
 
 export default function Cart() {
   const [promoCode, setPromoCode] = useState("");
@@ -44,7 +45,7 @@ export default function Cart() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -75,7 +76,7 @@ export default function Cart() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -106,7 +107,7 @@ export default function Cart() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -148,7 +149,7 @@ export default function Cart() {
           <ShoppingBag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Votre panier</h1>
           <p className="text-gray-600 mb-8">Vous devez être connecté pour voir votre panier.</p>
-          <Button onClick={() => window.location.href = "/api/login"} data-testid="cart-login">
+          <Button onClick={() => (window.location.href = `${API_BASE}/api/login`)} data-testid="cart-login">
             Se connecter
           </Button>
         </div>

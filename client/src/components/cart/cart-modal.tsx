@@ -10,6 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Link } from "wouter";
 import type { CartItem, Product } from "@shared/schema";
+import { API_BASE } from "@/lib/api";
 
 interface CartModalProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -72,7 +73,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -110,7 +111,7 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
           </SheetHeader>
           <div className="flex flex-col items-center justify-center h-full text-center">
             <p className="text-gray-600 mb-4">Vous devez être connecté pour voir votre panier.</p>
-            <Button onClick={() => window.location.href = "/api/login"} data-testid="cart-login-button">
+            <Button onClick={() => (window.location.href = `${API_BASE}/api/login`)} data-testid="cart-login-button">
               Se connecter
             </Button>
           </div>

@@ -37,6 +37,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { API_BASE } from "@/lib/api";
 
 // ---------- Types ----------
 interface AdminStats {
@@ -198,7 +199,7 @@ export default function AdminDashboard() {
               <h1 className="text-2xl font-semibold">Tableau de bord</h1>
               <div className="flex items-center gap-3">
                 <Button asChild variant="outline"><Link href="/"><Eye className="mr-2 h-4 w-4"/>Voir le site</Link></Button>
-                <Button variant="outline" onClick={() => (window.location.href = "/api/logout")}> <LogOut className="mr-2 h-4 w-4"/>Déconnexion</Button>
+                <Button variant="outline" onClick={() => (window.location.href = `${API_BASE}/api/logout`)}> <LogOut className="mr-2 h-4 w-4"/>Déconnexion</Button>
               </div>
             </div>
           </header>
