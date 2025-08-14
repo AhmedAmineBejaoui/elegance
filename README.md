@@ -130,6 +130,10 @@ npm start
 
 The Express server automatically listens on the port provided via `PORT` and serves the Vite build output from `dist/public`. A basic health check is exposed at `/api/health`.
 
+### Deploying on Render
+
+The included `render.yaml` provisions a free PostgreSQL database and configures the service to run `npm install && npm run build` during the build phase and `npm start` at runtime. Static assets are served from the prebuilt `dist/public` directory. If `DATABASE_URL` is not set, the server will still boot but only serve the static frontend; API routes remain disabled.
+
 ## API Endpoints
 
 ### Authentication

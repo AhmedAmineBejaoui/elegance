@@ -1,7 +1,7 @@
 import "./load-env";
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { createServer, type Server } from "http";
 // @ts-ignore - multer n'a pas de types dans ce projet
 import multer from "multer";
 
@@ -61,8 +61,16 @@ app.get("/api/health", (_req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
+
 (async () => {
-  const server = await registerRoutes(app);
+  let server: Server;
+  if (process.env.DATABASE_URL) {
+    const { registerRoutes } = await import("./routes");
+    server = await registerRoutes(app);
+  } else {
+    server = createServer(app);
+    log("DATABASE_URL not set, API routes disabled", "warn");
+  }
 
   // Gestion des erreurs globales
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
