@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Link } from "wouter";
+import { API_BASE } from "@/lib/api";
 
 export default function AdminOrders() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,7 +37,7 @@ export default function AdminOrders() {
     }
   }, [isAuthenticated, isLoading, user, toast]);
 
-  const { data: orders = [], isLoading: ordersLoading } = useQuery({
+  const { data: ordersData = [], isLoading: ordersLoading } = useQuery({
     queryKey: ["/api/orders"],
     enabled: isAuthenticated && user?.role === 'admin',
   });
@@ -45,6 +46,8 @@ export default function AdminOrders() {
     queryKey: ["/api/orders", selectedOrder?.id],
     enabled: !!selectedOrder?.id && isAuthenticated && user?.role === 'admin',
   });
+
+  const orders = Array.isArray(ordersData) ? ordersData : [];
 
   const updateOrderMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
@@ -65,7 +68,7 @@ export default function AdminOrders() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -200,7 +203,7 @@ export default function AdminOrders() {
                 <Button asChild variant="outline">
                   <Link href="/">Voir le site</Link>
                 </Button>
-                <Button onClick={() => window.location.href = "/api/logout"} variant="outline">
+                <Button onClick={() => (window.location.href = `${API_BASE}/api/logout`)} variant="outline">
                   Déconnexion
                 </Button>
               </div>

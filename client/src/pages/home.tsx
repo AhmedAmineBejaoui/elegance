@@ -10,13 +10,18 @@ import { useQuery } from "@tanstack/react-query";
 import type { Product, Category } from "@shared/schema";
 
 export default function Home() {
-  const { data: featuredProducts = [] } = useQuery<Product[]>({
+  const { data: featuredProductsData = [] } = useQuery<Product[]>({
     queryKey: ["/api/products?isFeatured=true&limit=8"],
   });
 
-  const { data: categories = [] } = useQuery<Category[]>({
+  const { data: categoriesData = [] } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
+
+  const featuredProducts = Array.isArray(featuredProductsData)
+    ? featuredProductsData
+    : [];
+  const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
   return (
     <div className="min-h-screen">

@@ -75,16 +75,17 @@ export default function OrderTracking() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {order.items?.map((item: any) => (
-              <div key={item.id} className="flex justify-between text-sm">
-                <span>
-                  {item.product?.name} × {item.quantity}
-                </span>
-                <span>
-                  {(parseFloat(item.price) * item.quantity).toFixed(2)} DT
-                </span>
-              </div>
-            ))}
+            {Array.isArray(order.items) &&
+              order.items.map((item: any) => (
+                <div key={item.id} className="flex justify-between text-sm">
+                  <span>
+                    {item.product?.name} × {item.quantity}
+                  </span>
+                  <span>
+                    {(parseFloat(item.price) * item.quantity).toFixed(2)} DT
+                  </span>
+                </div>
+              ))}
             <div className="flex justify-between font-medium pt-4">
               <span>Total</span>
               <span>{order.total} DT</span>

@@ -32,6 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { useFavorites } from "@/hooks/useFavorites";
+import { API_BASE } from "@/lib/api";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/products/:slug");
@@ -53,17 +54,26 @@ export default function ProductDetail() {
     enabled: !!params?.slug,
   });
 
-  const { data: relatedProducts = [] } = useQuery<any[]>({
+  const { data: relatedProductsData = [] } = useQuery<any[]>({
     queryKey: product?.categoryId
       ? [`/api/products?categoryId=${product.categoryId}&limit=4`]
       : [],
     enabled: !!product?.categoryId,
   });
 
-  const { data: reviews = [] } = useQuery<any[]>({
+  const { data: reviewsData = [] } = useQuery<any[]>({
     queryKey: product?.id ? ["/api/products", product.id, "reviews"] : [],
     enabled: !!product?.id,
   });
+
+  const relatedProducts = Array.isArray(relatedProductsData)
+    ? relatedProductsData
+    : [];
+  const reviews = Array.isArray(reviewsData) ? reviewsData : [];
+
+  const images = Array.isArray(product?.images) ? product.images : [];
+  const sizes = Array.isArray(product?.sizes) ? product.sizes : [];
+  const colors = Array.isArray(product?.colors) ? product.colors : [];
 
   const addToCartMutation = useMutation({
     mutationFn: async () => {
@@ -91,7 +101,7 @@ export default function ProductDetail() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -141,7 +151,7 @@ export default function ProductDetail() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -276,7 +286,7 @@ export default function ProductDetail() {
             {/* Image Thumbnails */}
             {product.images && product.images.length > 1 && (
               <div className="flex space-x-2 overflow-x-auto">
-                {product.images.map((image: string, index: number) => (
+                {images.map((image: string, index: number) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
@@ -345,7 +355,7 @@ export default function ProductDetail() {
                     <SelectValue placeholder="Taille" />
                   </SelectTrigger>
                   <SelectContent>
-                    {product.sizes.map((size: string) => (
+                    {sizes.map((size: string) => (
                       <SelectItem key={size} value={size}>
                         {size}
                       </SelectItem>
@@ -366,7 +376,7 @@ export default function ProductDetail() {
                     <SelectValue placeholder="Couleur" />
                   </SelectTrigger>
                   <SelectContent>
-                    {product.colors.map((color: string) => (
+                    {colors.map((color: string) => (
                       <SelectItem key={color} value={color}>
                         {color}
                       </SelectItem>

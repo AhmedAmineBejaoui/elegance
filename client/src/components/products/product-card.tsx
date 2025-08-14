@@ -11,6 +11,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Link } from "wouter";
+import { API_BASE } from "@/lib/api";
 
 interface ProductCardProps {
   product: any;
@@ -45,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }

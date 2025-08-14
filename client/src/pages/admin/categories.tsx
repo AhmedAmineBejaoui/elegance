@@ -20,6 +20,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Link } from "wouter";
 import type { Category, InsertCategory } from "@shared/schema";
+import { API_BASE } from "@/lib/api";
 
 interface CategoryFormData {
   name: string;
@@ -52,10 +53,12 @@ export default function AdminCategories() {
     }
   }, [isAuthenticated, isLoading, user, toast]);
 
-  const { data: categories = [], isLoading: categoriesLoading } = useQuery<Category[]>({
+  const { data: categoriesData = [], isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
     enabled: isAuthenticated && user?.role === "admin",
   });
+
+  const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
   const createCategoryMutation = useMutation({
     mutationFn: async (data: InsertCategory) => {
@@ -78,7 +81,7 @@ export default function AdminCategories() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
       } else {
         toast({
@@ -109,7 +112,7 @@ export default function AdminCategories() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
       } else {
         toast({

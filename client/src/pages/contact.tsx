@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail, CheckCircle2, AlertTriangle } from "lucide-react";
+import { API_BASE } from "@/lib/api";
 
 export default function ContactPage() {
   const [name, setName] = useState("");
@@ -28,7 +29,7 @@ export default function ContactPage() {
 
     setSubmitting(true);
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch(`${API_BASE}/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, message, website }),

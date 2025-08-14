@@ -1,11 +1,10 @@
 import "./load-env";
 import express, { type Request, Response, NextFunction } from "express";
-import { setupVite, serveStatic, log } from "./vite";
-import { createServer, type Server } from "http";
+import { log } from "./vite";
 // @ts-ignore - multer n'a pas de types dans ce projet
 import multer from "multer";
 
-const app = express();
+export const app = express();
 app.set("etag", false);
 
 // Middleware global (désactive l'avertissement sur toutes les routes)
@@ -61,38 +60,30 @@ app.get("/api/health", (_req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
+if (process.env.DATABASE_URL) {
+  const { registerRoutes } = await import("./routes");
+  await registerRoutes(app);
+} else {
+  log("DATABASE_URL not set, API routes disabled", "warn");
+}
 
-(async () => {
-  let server: Server;
-  if (process.env.DATABASE_URL) {
-    const { registerRoutes } = await import("./routes");
-    server = await registerRoutes(app);
-  } else {
-    server = createServer(app);
-    log("DATABASE_URL not set, API routes disabled", "warn");
+// Gestion des erreurs globales
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(413).json({ message: "Fichier trop volumineux (max 10MB)" });
   }
 
-  // Gestion des erreurs globales
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    if (err.code === "LIMIT_FILE_SIZE") {
-      return res.status(413).json({ message: "Fichier trop volumineux (max 10MB)" });
-    }
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  res.status(status).json({ message });
+  throw err;
+});
 
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-    res.status(status).json({ message });
-    throw err;
-  });
+export default app;
 
-  // ✨ Vite en dev | fichiers statiques en prod
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
-
+if (process.env.VERCEL !== "1") {
   const port = parseInt(process.env.PORT || "5000", 10);
-  server.listen(port, "0.0.0.0", () => {
+  app.listen(port, "0.0.0.0", () => {
     log(`✨ Server running on http://localhost:${port}`);
   });
-})();
+}
