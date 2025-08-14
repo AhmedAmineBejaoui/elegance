@@ -91,7 +91,7 @@ export default function AdminProducts() {
     }
   }, [isAuthenticated, isLoading, user, toast]);
 
-  const { data: products = [], isLoading: productsLoading } = useQuery<Product[]>({
+  const { data: productsData = [], isLoading: productsLoading } = useQuery<Product[]>({
     queryKey: [`/api/products?${new URLSearchParams({
       ...(searchTerm && { search: searchTerm }),
       ...(selectedCategory && { categoryId: selectedCategory })
@@ -99,10 +99,13 @@ export default function AdminProducts() {
     enabled: isAuthenticated && user?.role === 'admin',
   });
 
-  const { data: categories = [] } = useQuery<any[]>({
+  const { data: categoriesData = [] } = useQuery<any[]>({
     queryKey: ["/api/categories"],
     enabled: isAuthenticated && user?.role === 'admin',
   });
+
+  const products = Array.isArray(productsData) ? productsData : [];
+  const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
   const createProductMutation = useMutation({
     mutationFn: async (productData: any) => {

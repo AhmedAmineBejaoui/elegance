@@ -37,7 +37,7 @@ export default function AdminOrders() {
     }
   }, [isAuthenticated, isLoading, user, toast]);
 
-  const { data: orders = [], isLoading: ordersLoading } = useQuery({
+  const { data: ordersData = [], isLoading: ordersLoading } = useQuery({
     queryKey: ["/api/orders"],
     enabled: isAuthenticated && user?.role === 'admin',
   });
@@ -46,6 +46,8 @@ export default function AdminOrders() {
     queryKey: ["/api/orders", selectedOrder?.id],
     enabled: !!selectedOrder?.id && isAuthenticated && user?.role === 'admin',
   });
+
+  const orders = Array.isArray(ordersData) ? ordersData : [];
 
   const updateOrderMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {

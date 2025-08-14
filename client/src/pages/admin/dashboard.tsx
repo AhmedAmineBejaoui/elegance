@@ -98,15 +98,20 @@ export default function AdminDashboard() {
     enabled: isAuthenticated && user?.role === "admin",
   });
 
-  const { data: recentOrders = [], isLoading: ordersLoading } = useQuery<OrderRow[]>({
+  const { data: recentOrdersData = [], isLoading: ordersLoading } = useQuery<OrderRow[]>({
     queryKey: ["/api/orders"],
     enabled: isAuthenticated && user?.role === "admin",
   });
 
-  const { data: lowStockProducts = [], isLoading: productsLoading } = useQuery<Product[]>({
+  const { data: lowStockProductsData = [], isLoading: productsLoading } = useQuery<Product[]>({
     queryKey: ["/api/products?lowStock=true"],
     enabled: isAuthenticated && user?.role === "admin",
   });
+
+  const recentOrders = Array.isArray(recentOrdersData) ? recentOrdersData : [];
+  const lowStockProducts = Array.isArray(lowStockProductsData)
+    ? lowStockProductsData
+    : [];
 
   const salesSeries = stats?.salesByMonth ?? [];
 

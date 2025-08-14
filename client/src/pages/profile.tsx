@@ -47,10 +47,12 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  const { data: orders = [], isLoading: ordersLoading } = useQuery<any[]>({
+  const { data: ordersData = [], isLoading: ordersLoading } = useQuery<any[]>({
     queryKey: ["/api/orders/user"],
     enabled: isAuthenticated,
   });
+
+  const orders = Array.isArray(ordersData) ? ordersData : [];
 
   const updateProfileMutation = useMutation({
     mutationFn: (data: any) => apiRequest("PATCH", "/api/auth/profile", data),

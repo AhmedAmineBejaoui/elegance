@@ -53,10 +53,12 @@ export default function AdminCategories() {
     }
   }, [isAuthenticated, isLoading, user, toast]);
 
-  const { data: categories = [], isLoading: categoriesLoading } = useQuery<Category[]>({
+  const { data: categoriesData = [], isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
     enabled: isAuthenticated && user?.role === "admin",
   });
+
+  const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
   const createCategoryMutation = useMutation({
     mutationFn: async (data: InsertCategory) => {

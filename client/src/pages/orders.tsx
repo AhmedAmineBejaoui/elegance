@@ -66,10 +66,12 @@ function getStatusColor(status: string) {
 export default function Orders() {
   const { isAuthenticated, isLoading } = useAuth();
 
-  const { data: orders = [], isLoading: ordersLoading } = useQuery<any[]>({
+  const { data: ordersData = [], isLoading: ordersLoading } = useQuery<any[]>({
     queryKey: ["/api/orders/user"],
     enabled: isAuthenticated,
   });
+
+  const orders = Array.isArray(ordersData) ? ordersData : [];
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -179,7 +181,8 @@ export default function Orders() {
                   <CardContent className="space-y-4">
                     {/* Order Items */}
                     <div className="space-y-3">
-                      {order.items?.map((item: any, index: number) => (
+                      {Array.isArray(order.items)
+                        ? order.items.map((item: any, index: number) => (
                         <div key={index} className="flex items-center space-x-4" data-testid={`order-item-${item.id}`}>
                           <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
                             {item.product?.imageUrl ? (
@@ -202,7 +205,8 @@ export default function Orders() {
                             {(parseFloat(item.price) * item.quantity).toFixed(2)} DT
                           </p>
                         </div>
-                      ))}
+                          ))
+                        : null}
                     </div>
 
                     <Separator />

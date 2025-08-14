@@ -38,20 +38,25 @@ export default function AdminCustomers() {
 
   // Mock data for customers since we don't have a specific customers endpoint
   // In a real implementation, this would be fetched from an API
-  const { data: allUsers = [], isLoading: usersLoading } = useQuery({
+  const { data: allUsersData = [], isLoading: usersLoading } = useQuery({
     queryKey: ["/api/admin/customers"],
     enabled: isAuthenticated && user?.role === 'admin',
   });
 
-  const { data: customerOrders = [], isLoading: ordersLoading } = useQuery({
+  const { data: customerOrdersData = [], isLoading: ordersLoading } = useQuery({
     queryKey: selectedCustomer?.id
       ? [`/api/orders?userId=${selectedCustomer.id}`]
       : [],
     enabled: !!selectedCustomer?.id && isAuthenticated && user?.role === 'admin',
   });
 
+  const allUsers = Array.isArray(allUsersData) ? allUsersData : [];
+  const customerOrders = Array.isArray(customerOrdersData)
+    ? customerOrdersData
+    : [];
+
   // Filter only customers (non-admin users)
-  const customers = (allUsers as any[]).filter((userItem: any) => userItem.role === 'customer');
+  const customers = allUsers.filter((userItem: any) => userItem.role === 'customer');
 
   const filteredCustomers = customers.filter((customer: any) => {
     const matchesSearch = 

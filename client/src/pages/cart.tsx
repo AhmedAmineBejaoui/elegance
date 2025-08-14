@@ -20,10 +20,12 @@ export default function Cart() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: cartItems = [], isLoading } = useQuery({
+  const { data: cartItemsData = [], isLoading } = useQuery({
     queryKey: ["/api/cart"],
     enabled: isAuthenticated,
   });
+
+  const cartItems = Array.isArray(cartItemsData) ? cartItemsData : [];
 
   const { data: newsletterStatus } = useQuery<{ subscribed: boolean; discountAvailable: boolean }>({
     queryKey: ["/api/newsletter/status"],
@@ -158,7 +160,7 @@ export default function Cart() {
     );
   }
 
-  const subtotal = (cartItems as any[]).reduce((sum: number, item: any) => {
+  const subtotal = cartItems.reduce((sum: number, item: any) => {
     const price = parseFloat(item.product.salePrice || item.product.price);
     return sum + (price * item.quantity);
   }, 0);
@@ -183,7 +185,7 @@ export default function Cart() {
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900" data-testid="cart-title">
-            Votre Panier ({(cartItems as any[]).length} {(cartItems as any[]).length === 1 ? 'article' : 'articles'})
+            Votre Panier ({cartItems.length} {cartItems.length === 1 ? 'article' : 'articles'})
           </h1>
           <Link href="/products">
             <Button variant="outline" className="flex items-center space-x-2" data-testid="continue-shopping">
@@ -197,7 +199,7 @@ export default function Cart() {
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
-        ) : (cartItems as any[]).length === 0 ? (
+        ) : cartItems.length === 0 ? (
           <div className="text-center py-16" data-testid="empty-cart">
             <ShoppingBag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Votre panier est vide</h2>
@@ -227,7 +229,7 @@ export default function Cart() {
                 </Button>
               </div>
 
-              {(cartItems as any[]).map((item: any) => (
+              {cartItems.map((item: any) => (
                 <Card key={item.id} data-testid={`cart-item-${item.id}`}>
                   <CardContent className="p-6">
                     <div className="flex items-center space-x-4">
