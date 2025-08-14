@@ -83,7 +83,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
     serveStatic(app);
   }
 
-  const port = parseInt(process.env.PORT || "3000", 10);
+  const port = parseInt(process.env.PORT || "5000", 10);
   server.listen(port, "0.0.0.0", () => {
     log(`✨ Server running on http://localhost:${port}`);
   });
