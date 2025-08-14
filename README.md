@@ -130,6 +130,10 @@ npm start
 
 The Express server automatically listens on the port provided via `PORT` and serves the Vite build output from `dist/public`. A basic health check is exposed at `/api/health`.
 
+### Deploying on Render
+
+Render can use the included `render.yaml` to build and start the app. The configuration runs `npm install && npm run build` during the build phase and `npm start` to launch the production server, ensuring static assets are available before the server starts.
+
 ## API Endpoints
 
 ### Authentication
