@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { API_BASE } from "@/lib/api";
 
 export function Footer() {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ export function Footer() {
       return;
     }
     try {
-      const res = await fetch("/api/newsletter", {
+      const res = await fetch(`${API_BASE}/api/newsletter`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

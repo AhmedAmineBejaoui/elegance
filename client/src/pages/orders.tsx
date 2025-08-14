@@ -10,6 +10,7 @@ import { Link } from "wouter";
 import { useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
+import { API_BASE } from "@/lib/api";
 
 function getStatusIcon(status: string) {
   switch (status) {
@@ -73,14 +74,14 @@ export default function Orders() {
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      window.location.href = "/api/login";
+      window.location.href = `${API_BASE}/api/login`;
       return;
     }
   }, [isAuthenticated, isLoading]);
 
   const handleDownloadInvoice = async (orderId: number) => {
     try {
-      const res = await fetch(`/api/orders/${orderId}/invoice`, {
+      const res = await fetch(`${API_BASE}/api/orders/${orderId}/invoice`, {
         credentials: "include",
       });
       if (!res.ok) return;
