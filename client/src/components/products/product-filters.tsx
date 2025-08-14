@@ -27,9 +27,11 @@ export function ProductFilters({ filters, onFiltersChange }: ProductFiltersProps
   const [selectedColors, setSelectedColors] = useState<string[]>(filters.colors || []);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(filters.categoryId);
 
-  const { data: categories = [] } = useQuery<any[]>({
+  const { data: categoriesData = [] } = useQuery<any[]>({
     queryKey: ["/api/categories"],
   });
+
+  const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
   const availableSizes = ["XS", "S", "M", "L", "XL", "XXL"];
   const availableColors = ["Noir", "Blanc", "Rouge", "Bleu", "Vert", "Rose", "Beige", "Gris"];

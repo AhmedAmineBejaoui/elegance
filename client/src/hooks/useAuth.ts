@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { API_BASE } from "@/lib/api";
 
 async function fetchAuthUser() {
-  const res = await fetch("/api/auth/user", { credentials: "include" });
+  const res = await fetch(`${API_BASE}/api/auth/user`, { credentials: "include" });
 
   if (res.status === 401) {
     return { user: null }; // ✅ au lieu de throw

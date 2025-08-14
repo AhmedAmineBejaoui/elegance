@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Link, useLocation } from "wouter";
+import { API_BASE } from "@/lib/api";
 
 interface ShippingAddress {
   firstName: string;
@@ -91,7 +92,7 @@ export default function Checkout() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = `${API_BASE}/api/login`;
         }, 500);
         return;
       }
@@ -117,7 +118,7 @@ export default function Checkout() {
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Commande</h1>
           <p className="text-gray-600 mb-8">Vous devez être connecté pour passer une commande.</p>
-          <Button onClick={() => window.location.href = "/api/login"} data-testid="checkout-login">
+          <Button onClick={() => (window.location.href = `${API_BASE}/api/login`)} data-testid="checkout-login">
             Se connecter
           </Button>
         </div>

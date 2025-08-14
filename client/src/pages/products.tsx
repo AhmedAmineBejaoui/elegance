@@ -32,7 +32,7 @@ export default function Products() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchTerm, setSearchTerm] = useState(filters.search || "");
 
-  const { data: products = [], isLoading } = useQuery<Product[]>({
+  const { data: productsData = [], isLoading } = useQuery<Product[]>({
     queryKey: [`/api/products?${new URLSearchParams(
       Object.fromEntries(
         Object.entries(filters).filter(([, value]) => value !== undefined && value !== "")
@@ -41,9 +41,12 @@ export default function Products() {
     ).toString()}`],
   });
 
-  const { data: categories = [] } = useQuery<Category[]>({
+  const { data: categoriesData = [] } = useQuery<Category[]>({
     queryKey: ["/api/categories"],
   });
+
+  const products = Array.isArray(productsData) ? productsData : [];
+  const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
   // Update URL when filters change
   useEffect(() => {
