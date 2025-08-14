@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/footer";
 import { ProductCard } from "@/components/products/product-card";
 import { useQuery } from "@tanstack/react-query";
 import type { Product, Category } from "@shared/schema";
+import { asArray } from "@/lib/api";
 
 export default function Home() {
   const { data: featuredProductsData = [] } = useQuery<Product[]>({
@@ -18,10 +19,8 @@ export default function Home() {
     queryKey: ["/api/categories"],
   });
 
-  const featuredProducts = Array.isArray(featuredProductsData)
-    ? featuredProductsData
-    : [];
-  const categories = Array.isArray(categoriesData) ? categoriesData : [];
+  const featuredProducts = asArray<Product>(featuredProductsData);
+  const categories = asArray<Category>(categoriesData);
 
   return (
     <div className="min-h-screen">
@@ -78,7 +77,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {categories.slice(0, 3).map((category: any) => (
+            {asArray(categories).slice(0, 3).map((category: any) => (
               <Card
                 key={category.id}
                 className="group overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
@@ -131,7 +130,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.slice(0, 4).map((product: any) => (
+            {asArray(featuredProducts).slice(0, 4).map((product: any) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

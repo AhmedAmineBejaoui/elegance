@@ -32,7 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { useFavorites } from "@/hooks/useFavorites";
-import { API_BASE } from "@/lib/api";
+import { API_BASE, asArray } from "@/lib/api";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/products/:slug");
@@ -66,14 +66,12 @@ export default function ProductDetail() {
     enabled: !!product?.id,
   });
 
-  const relatedProducts = Array.isArray(relatedProductsData)
-    ? relatedProductsData
-    : [];
-  const reviews = Array.isArray(reviewsData) ? reviewsData : [];
+  const relatedProducts = asArray<any>(relatedProductsData);
+  const reviews = asArray<any>(reviewsData);
 
-  const images = Array.isArray(product?.images) ? product.images : [];
-  const sizes = Array.isArray(product?.sizes) ? product.sizes : [];
-  const colors = Array.isArray(product?.colors) ? product.colors : [];
+  const images = asArray<any>(product?.images);
+  const sizes = asArray<any>(product?.sizes);
+  const colors = asArray<any>(product?.colors);
 
   const addToCartMutation = useMutation({
     mutationFn: async () => {
@@ -590,7 +588,7 @@ export default function ProductDetail() {
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-8">Produits similaires</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" data-testid="related-products">
-              {relatedProducts.filter((p: any) => p.id !== product.id).slice(0, 4).map((product: any) => (
+              {asArray(relatedProducts).filter((p: any) => p.id !== product.id).slice(0, 4).map((product: any) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
