@@ -1,9 +1,7 @@
-const { neon } = require('@neondatabase/serverless');
-const bcrypt = require('bcryptjs');
+import { sql } from '@vercel/postgres';
+import bcrypt from 'bcryptjs';
 
-const sql = neon(process.env.DATABASE_URL);
-
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -27,8 +25,8 @@ module.exports = async function handler(req, res) {
     }
 
     // Find user by email
-    const users = await sql`SELECT * FROM users WHERE email = ${email} LIMIT 1`;
-    const user = users[0];
+    const { rows } = await sql`SELECT * FROM users WHERE email = ${email} LIMIT 1`;
+    const user = rows[0];
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
@@ -49,9 +47,9 @@ module.exports = async function handler(req, res) {
     });
   } catch (error) {
     console.error('Login API error:', error);
-    res.status(500).json({ 
-      message: 'Database error', 
-      error: error.message 
+    res.status(500).json({
+      message: 'Database error',
+      error: error.message
     });
   }
 }
