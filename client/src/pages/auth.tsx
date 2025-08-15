@@ -26,8 +26,9 @@ export default function AuthPage() {
   }
 
   const onSubmit = async (data: any) => {
-    const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register";
-    const res = await fetch(`${API_BASE}${endpoint}`, {
+    // Use absolute API paths to avoid relative URL issues
+    const url = mode === "login" ? "/api/auth/login" : "/api/auth/register";
+    const res = await fetch(`${API_BASE}${url}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
