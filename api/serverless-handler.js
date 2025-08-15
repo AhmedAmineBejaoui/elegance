@@ -7,9 +7,19 @@ let isInitialized = false;
 // Initialize the app once
 const initializeApp = async () => {
   if (!isInitialized) {
-    // Import and register routes only once
-    const { registerRoutes } = await import('../dist/server/routes.js');
-    await registerRoutes(app);
+    // Only register routes if we have DATABASE_URL
+    if (process.env.DATABASE_URL) {
+      try {
+        const { registerRoutes } = await import('../dist/server/routes.js');
+        await registerRoutes(app);
+        console.log('Routes registered successfully');
+      } catch (error) {
+        console.error('Failed to register routes:', error);
+        // Don't throw, just log - let the app start without routes
+      }
+    } else {
+      console.warn('DATABASE_URL not set, skipping route registration');
+    }
     isInitialized = true;
   }
   return app;
