@@ -1,17 +1,17 @@
+
 {
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist/public",
   "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs20.x",
-      "maxDuration": 30
+    "api/index.js": {
+      "runtime": "@vercel/node@2.0.0"
     }
   },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "dest": "/api/index.js"
     },
     {
       "src": "/assets/(.*)",
