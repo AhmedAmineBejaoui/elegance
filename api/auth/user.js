@@ -1,8 +1,6 @@
-const { neon } = require('@neondatabase/serverless');
+import { sql } from '@vercel/postgres';
 
-const sql = neon(process.env.DATABASE_URL);
-
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -34,8 +32,8 @@ module.exports = async function handler(req, res) {
     
     // In a real implementation, you'd verify the JWT token here
     // For now, treat token as user ID for simplicity
-    const users = await sql`SELECT id, email, username, role FROM users WHERE id = ${token} LIMIT 1`;
-    const user = users[0];
+    const { rows } = await sql`SELECT id, email, username, role FROM users WHERE id = ${token} LIMIT 1`;
+    const user = rows[0];
 
     if (!user) {
       return res.status(200).json({ 
@@ -50,9 +48,9 @@ module.exports = async function handler(req, res) {
     });
   } catch (error) {
     console.error('Auth user API error:', error);
-    res.status(200).json({ 
-      user: null, 
-      authenticated: false 
+    res.status(200).json({
+      user: null,
+      authenticated: false
     });
   }
 }

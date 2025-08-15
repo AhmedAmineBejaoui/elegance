@@ -1,6 +1,4 @@
-import { neon } from '@neondatabase/serverless';
-
-const sql = neon(process.env.DATABASE_URL);
+import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
   // CORS headers
@@ -28,16 +26,16 @@ export default async function handler(req, res) {
       query += ` ORDER BY p.created_at DESC LIMIT ${parseInt(limit)}`;
       
       const products = await sql.unsafe(query);
-      res.status(200).json({ items: products });
+      res.status(200).json({ items: products.rows });
     } else {
       res.status(405).json({ message: 'Method not allowed' });
     }
   } catch (error) {
     console.error('Products API error:', error);
-    res.status(500).json({ 
-      message: 'Database error', 
+    res.status(500).json({
+      message: 'Database error',
       error: error.message,
-      hasDatabase: !!process.env.DATABASE_URL
+      hasDatabase: !!process.env.POSTGRES_URL
     });
   }
 }
