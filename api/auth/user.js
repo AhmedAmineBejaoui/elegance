@@ -27,6 +27,12 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Early return if database is not configured
+  if (!process.env.POSTGRES_URL) {
+    res.status(200).json({ user: null, authenticated: false });
+    return;
+  }
+
   try {
     const token = getToken(req);
 

@@ -22,6 +22,12 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Early return if database is not configured
+  if (!process.env.POSTGRES_URL) {
+    res.status(503).json({ message: 'Database not configured' });
+    return;
+  }
+
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body;
     const { email, password } = body;
