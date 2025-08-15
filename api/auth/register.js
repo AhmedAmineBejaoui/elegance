@@ -1,9 +1,7 @@
-const { neon } = require('@neondatabase/serverless');
-const bcrypt = require('bcryptjs');
+import { sql } from '@vercel/postgres';
+import bcrypt from 'bcryptjs';
 
-const sql = neon(process.env.DATABASE_URL);
-
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -27,7 +25,7 @@ module.exports = async function handler(req, res) {
     }
 
     // Check if user already exists
-    const existingUsers = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
+    const { rows: existingUsers } = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
     if (existingUsers.length > 0) {
       return res.status(409).json({ message: 'User already exists with this email' });
     }
@@ -37,7 +35,7 @@ module.exports = async function handler(req, res) {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Create user
-    const newUsers = await sql`
+    const { rows: newUsers } = await sql`
       INSERT INTO users (email, password, username, role, created_at, updated_at)
       VALUES (${email}, ${hashedPassword}, ${username}, 'user', NOW(), NOW())
       RETURNING id, email, username, role, created_at
@@ -51,9 +49,9 @@ module.exports = async function handler(req, res) {
     });
   } catch (error) {
     console.error('Register API error:', error);
-    res.status(500).json({ 
-      message: 'Database error', 
-      error: error.message 
+    res.status(500).json({
+      message: 'Database error',
+      error: error.message
     });
   }
 }
