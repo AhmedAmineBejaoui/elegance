@@ -59,10 +59,11 @@ app.get("/api/health", (_req: Request, res: Response) => {
   res.json({ ok: true });
 });
 
-if (process.env.DATABASE_URL) {
+// Routes will be registered in serverless handler or local dev
+if (process.env.NODE_ENV === "development" && process.env.DATABASE_URL) {
   const { registerRoutes } = await import("./routes");
   await registerRoutes(app);
-} else {
+} else if (!process.env.DATABASE_URL) {
   log("DATABASE_URL not set, API routes disabled", "warn");
 }
 
