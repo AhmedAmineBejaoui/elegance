@@ -13,7 +13,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
 // ✅ Middleware pour les JSON / formulaire volumineux
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
@@ -81,6 +80,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 export default app;
 
+// Only start server if not in Vercel environment
 if (process.env.VERCEL !== "1") {
   const port = parseInt(process.env.PORT || "5000", 10);
   app.listen(port, "0.0.0.0", () => {
