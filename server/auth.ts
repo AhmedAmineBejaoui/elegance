@@ -3,7 +3,7 @@ import type { Express, RequestHandler } from "express";
 import passport from "passport";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
-import { Pool } from "@vercel/postgres";
+import { createPool } from "@vercel/postgres";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcryptjs";
@@ -63,7 +63,7 @@ export async function setupAuth(app: Express): Promise<void> {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 7 jours
   const PgStore = connectPg(session);
   const sessionStore = new PgStore({
-    pool: new Pool({ connectionString: POSTGRES_URL }),
+    pool: createPool({ connectionString: POSTGRES_URL }),
     createTableIfMissing: false, // mets true si la table "sessions" n'existe pas
     ttl: sessionTtl / 1000, // connect-pg-simple attend des secondes si set via "ttl"
     tableName: "sessions",
