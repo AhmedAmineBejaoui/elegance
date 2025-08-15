@@ -1,4 +1,7 @@
-export const API_BASE = import.meta.env.VITE_API_URL ?? ""; // vide = même origine
+// Normalize API base to avoid accidentally generating relative URLs
+// e.g. when VITE_API_URL is set to "./" which would lead to "./api/..." calls
+const rawApiBase = import.meta.env.VITE_API_URL ?? "";
+export const API_BASE = rawApiBase.startsWith(".") ? "" : rawApiBase; // default: same origin
 
 export async function api(path: string, init?: RequestInit) {
   const res = await fetch(`${API_BASE}${path}`, { credentials: "include", ...init });
