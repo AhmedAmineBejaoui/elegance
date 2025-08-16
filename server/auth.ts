@@ -9,23 +9,10 @@ import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
 
-/** Nettoie un path issu du .env (retire espaces, query, fragment) et garantit un "/" initial */
-function sanitizeCallbackPath(raw: string | undefined, fallback = "/api/callback"): string {
-  const s = (raw ?? fallback).trim();
-  // supprime tout après "#" (fragment) et après "?" (query)
-  const noHash = s.replace(/#.*/, "");
-  const noQuery = noHash.replace(/\?.*/, "");
-  // retire tous les espaces éventuels (évite %20)
-  const noSpaces = noQuery.replace(/\s+/g, "");
-  if (!noSpaces.startsWith("/")) return `/${noSpaces}`;
-  return noSpaces || fallback;
-}
-
-/** Supprime les espaces et le slash final de base URL */
-function sanitizeBaseUrl(raw: string | undefined): string {
-  if (!raw) throw new Error("PUBLIC_BASE_URL manquant dans .env");
-  return raw.trim().replace(/\/+$/, "");
-}
+// URL de callback utilisée pour Google OAuth (prod)
+const PUBLIC_BASE_URL = "https://elegance-rho.vercel.app"; // prod
+const CALLBACK_PATH = "/api/callback";
+const REDIRECT_URI = `${PUBLIC_BASE_URL}${CALLBACK_PATH}`;
 
 export async function setupAuth(app: Express): Promise<void> {
   const {
@@ -33,8 +20,6 @@ export async function setupAuth(app: Express): Promise<void> {
     POSTGRES_URL,
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
-    PUBLIC_BASE_URL,
-    GOOGLE_CALLBACK_PATH, // peut contenir des espaces/commentaires -> on nettoie
     NODE_ENV,
   } = process.env;
 
@@ -47,15 +32,8 @@ export async function setupAuth(app: Express): Promise<void> {
     );
   }
 
-  const base = sanitizeBaseUrl(PUBLIC_BASE_URL);
-  const cleanPath = sanitizeCallbackPath(GOOGLE_CALLBACK_PATH, "/api/callback");
-
-  // Construit l'URL finale de callback, sans query ni hash
-  const callbackURL = new URL(cleanPath, base + "/");
-  callbackURL.hash = "";
-  callbackURL.search = "";
-  const callbackUrlString = callbackURL.toString(); // p.ex. http://localhost:5000/api/callback
-  const callbackPath = callbackURL.pathname;        // p.ex. /api/callback
+  const callbackUrlString = REDIRECT_URI;
+  const callbackPath = CALLBACK_PATH;
 
   // ---- Sessions ----
   app.set("trust proxy", 1); // requis si on est derrière un proxy (ngrok/railway/etc.)

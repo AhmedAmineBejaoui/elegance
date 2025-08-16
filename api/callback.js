@@ -2,6 +2,11 @@
 import jwt from 'jsonwebtoken';
 import { sql } from '@vercel/postgres';
 
+// URL de callback utilisée pour Google OAuth (prod)
+const PUBLIC_BASE_URL = "https://elegance-rho.vercel.app"; // prod
+const CALLBACK_PATH = "/api/callback";
+const REDIRECT_URI = `${PUBLIC_BASE_URL}${CALLBACK_PATH}`;
+
 // Vercel Node functions get global fetch (Node 18+), no need for node-fetch
 
 export default async function handler(req, res) {
@@ -14,9 +19,7 @@ export default async function handler(req, res) {
     const code = req.query.code;
     if (!code) return res.status(400).json({ message: 'Missing code' });
 
-    const base = process.env.PUBLIC_BASE_URL;              // e.g. https://your-app.vercel.app  (NO trailing /)
-    const callbackPath = process.env.GOOGLE_CALLBACK_PATH; // e.g. /api/callback
-    const redirectUri = `${base}${callbackPath}`;
+    const redirectUri = REDIRECT_URI;
 
     // 1) Exchange authorization code -> tokens
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
