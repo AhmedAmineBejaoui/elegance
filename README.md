@@ -142,7 +142,7 @@ The included `render.yaml` provisions a free PostgreSQL database and configures 
 
 - POST `/api/auth/register` - Register a new user
 - POST `/api/auth/login` - Authenticate user
-- POST `/api/auth/logout` - Logout user
+- GET or POST `/api/logout` - Logout user
 - GET `/api/auth/session` - Get current session
 
 ### Products
