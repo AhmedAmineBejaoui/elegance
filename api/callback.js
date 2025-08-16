@@ -1,4 +1,5 @@
 // /api/callback.js
+
 import jwt from 'jsonwebtoken';
 import { sql } from '@vercel/postgres';
 
@@ -51,6 +52,7 @@ export default async function handler(req, res) {
 
     if (!email) return res.status(400).json({ message: 'No email' });
 
+
     // 3) upsert user
     await sql`
       CREATE TABLE IF NOT EXISTS users (
@@ -74,10 +76,12 @@ export default async function handler(req, res) {
     `;
     const user = rows[0];
 
+
     // 4) promotion admin éventuelle
     if (process.env.ADMIN_EMAIL && process.env.ADMIN_EMAIL === email) {
       await sql`UPDATE users SET role = 'admin' WHERE email = ${email}`;
     }
+
 
     // 5) cookie session
     const session = jwt.sign({ sub: String(user.id), email: user.email, provider: 'google' }, process.env.SESSION_SECRET, { expiresIn: '7d' });
