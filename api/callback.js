@@ -1,86 +1,97 @@
 // /api/callback.js
-import jwt from "jsonwebtoken";
-import { sql } from "@vercel/postgres";
+
+import jwt from 'jsonwebtoken';
+import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
-  if (req.method !== "GET") {
-    res.setHeader("Allow", ["GET"]);
-    return res.status(405).json({ message: "Method not allowed" });
+  if (req.method !== 'GET') {
+    res.setHeader('Allow', 'GET');
+    return res.status(405).end();
   }
 
   try {
     const code = req.query.code;
-    if (!code) return res.status(400).json({ message: "Missing code" });
+    if (!code) return res.status(400).json({ message: 'Missing code' });
 
-    const base = process.env.PUBLIC_BASE_URL || `https://${req.headers.host}`;
-    const redirect_uri = `${base}/api/callback`;
+    const proto = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const redirectUri = `${proto}://${host}/api/callback`;
 
-    const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    // 1) échange code -> tokens
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         code,
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri,
-        grant_type: "authorization_code",
-      }),
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code'
+      })
     });
     const tokens = await tokenRes.json();
     if (!tokenRes.ok) {
-      console.error("[TOKEN]", tokenRes.status, tokens);
-      return res.status(400).json({ step: "token", error: tokens });
+      console.error('[OAUTH TOKEN ERROR]', { status: tokenRes.status, tokens, redirectUri });
+      return res.status(400).json({ step: 'token', error: tokens });
     }
 
-    const userRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-      headers: { Authorization: `Bearer ${tokens.access_token}` },
+    // 2) profil
+    const uRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${tokens.access_token}` }
     });
-    const profile = await userRes.json();
-    if (!userRes.ok) {
-      console.error("[USERINFO]", userRes.status, profile);
-      return res.status(400).json({ step: "userinfo", error: profile });
+    const profile = await uRes.json();
+    if (!uRes.ok) {
+      console.error('[USERINFO ERROR]', profile);
+      return res.status(400).json({ step: 'userinfo', error: profile });
     }
 
     const email = profile.email;
-    if (!email) return res.status(400).json({ message: "Google profile has no email" });
+    const firstName = profile.given_name || '';
+    const lastName = profile.family_name || '';
+    const picture = profile.picture || '';
 
-    // Upsert de l'utilisateur dans la base
-    const firstName = profile.given_name || null;
-    const lastName = profile.family_name || null;
-    const avatarUrl = profile.picture || null;
+    if (!email) return res.status(400).json({ message: 'No email' });
 
+
+    // 3) upsert user
+    await sql`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        first_name TEXT,
+        last_name  TEXT,
+        email      TEXT UNIQUE NOT NULL,
+        password_hash TEXT,
+        avatar_url TEXT,
+        role TEXT NOT NULL DEFAULT 'user'
+      )
+    `;
     const { rows } = await sql`
-      INSERT INTO users (email, first_name, last_name, avatar_url)
-      VALUES (${email}, ${firstName}, ${lastName}, ${avatarUrl})
+      INSERT INTO users (first_name, last_name, email, avatar_url)
+      VALUES (${firstName}, ${lastName}, ${email}, ${picture})
       ON CONFLICT (email) DO UPDATE SET
         first_name = EXCLUDED.first_name,
-        last_name = EXCLUDED.last_name,
+        last_name  = EXCLUDED.last_name,
         avatar_url = EXCLUDED.avatar_url
-      RETURNING id
+      RETURNING id, email
     `;
     const user = rows[0];
 
-    if (!user) return res.status(500).json({ step: "db", message: "User upsert failed" });
 
-    // Promotion automatique en admin si nécessaire
+    // 4) promotion admin éventuelle
     if (process.env.ADMIN_EMAIL && process.env.ADMIN_EMAIL === email) {
       await sql`UPDATE users SET role = 'admin' WHERE email = ${email}`;
     }
 
-    const secret = process.env.SESSION_SECRET;
-    if (!secret) return res.status(500).json({ step: "jwt", message: "SESSION_SECRET missing" });
 
-    const payload = { sub: user.id, email, provider: "google" };
-    const sessionToken = jwt.sign(payload, secret, { expiresIn: "7d" });
+    // 5) cookie session
+    const session = jwt.sign({ sub: String(user.id), email: user.email, provider: 'google' }, process.env.SESSION_SECRET, { expiresIn: '7d' });
+    const week = 7 * 24 * 60 * 60;
+    res.setHeader('Set-Cookie', `session=${session}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${week}`);
 
-    res.setHeader(
-      "Set-Cookie",
-      `session=${sessionToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
-    );
-
-    return res.redirect(302, "/");
+    // 6) redirection
+    return res.redirect('/');
   } catch (e) {
-    console.error("[CALLBACK CRASH]", e);
-    return res.status(500).json({ message: "Internal error", error: String(e) });
+    console.error('[CALLBACK ERROR]', e);
+    return res.status(500).json({ message: 'Internal error' });
   }
 }

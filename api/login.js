@@ -1,20 +1,23 @@
 // /api/login.js
 export default async function handler(req, res) {
-  const base = process.env.PUBLIC_BASE_URL || `https://${req.headers.host}`; // ex: https://elegance-rho.vercel.app
-  const redirectUri = `${base}/api/callback`;
+  if (req.method !== 'GET') {
+    res.setHeader('Allow', 'GET');
+    return res.status(405).end();
+  }
+
+  const proto = req.headers['x-forwarded-proto'] || 'https';
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  const redirectUri = `${proto}://${host}/api/callback`;
 
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID,
     redirect_uri: redirectUri,
     response_type: 'code',
     scope: 'openid email profile',
-    access_type: 'offline',
-    prompt: 'consent'
+    prompt: 'consent',
+    access_type: 'online'
   });
 
-  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-
-  console.log('[LOGIN] client_id=', process.env.GOOGLE_CLIENT_ID);
-  console.log('[LOGIN] redirect_uri=', redirectUri);
-  return res.redirect(authUrl);
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  return res.redirect(url);
 }
