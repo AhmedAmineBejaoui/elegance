@@ -29,7 +29,7 @@ export default async function handler(req, res) {
         code,
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: redirectUri,          // MUST match the value used in /api/login
+        redirect_uri: REDIRECT_URI,          
         grant_type: 'authorization_code'
       })
     });
