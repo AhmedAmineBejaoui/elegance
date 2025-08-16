@@ -1,5 +1,6 @@
 // /api/callback.js
 import jwt from "jsonwebtoken";
+import { sql } from "@vercel/postgres";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -43,12 +44,33 @@ export default async function handler(req, res) {
     const email = profile.email;
     if (!email) return res.status(400).json({ message: "Google profile has no email" });
 
-    // Si tu n'utilises pas encore la DB, on peut mettre l'email comme sub
-    const payload = { sub: email, email, provider: "google" };
+    // Upsert de l'utilisateur dans la base
+    const firstName = profile.given_name || null;
+    const lastName = profile.family_name || null;
+    const avatarUrl = profile.picture || null;
+
+    const { rows } = await sql`
+      INSERT INTO users (email, first_name, last_name, avatar_url)
+      VALUES (${email}, ${firstName}, ${lastName}, ${avatarUrl})
+      ON CONFLICT (email) DO UPDATE SET
+        first_name = EXCLUDED.first_name,
+        last_name = EXCLUDED.last_name,
+        avatar_url = EXCLUDED.avatar_url
+      RETURNING id
+    `;
+    const user = rows[0];
+
+    if (!user) return res.status(500).json({ step: "db", message: "User upsert failed" });
+
+    // Promotion automatique en admin si nécessaire
+    if (process.env.ADMIN_EMAIL && process.env.ADMIN_EMAIL === email) {
+      await sql`UPDATE users SET role = 'admin' WHERE email = ${email}`;
+    }
 
     const secret = process.env.SESSION_SECRET;
     if (!secret) return res.status(500).json({ step: "jwt", message: "SESSION_SECRET missing" });
 
+    const payload = { sub: user.id, email, provider: "google" };
     const sessionToken = jwt.sign(payload, secret, { expiresIn: "7d" });
 
     res.setHeader(
