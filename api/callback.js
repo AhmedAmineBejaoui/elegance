@@ -1,33 +1,41 @@
 // /api/callback.js
+
 import jwt from "jsonwebtoken";
 import { sql } from "@vercel/postgres";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).end();
 
+
   try {
     const code = req.query.code;
-    if (!code) return res.status(400).json({ message: "Missing code" });
+    if (!code) return res.status(400).json({ message: 'Missing code' });
+
 
     const proto = req.headers["x-forwarded-proto"] || "https";
     const host = req.headers["x-forwarded-host"] || req.headers.host;
     const base = process.env.PUBLIC_BASE_URL || `${proto}://${host}`;
     const redirectUri = `${base}/api/callback`;
 
-    const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+
+    // 1) échange code -> tokens
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         code,
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: redirectUri,
+
         grant_type: "authorization_code",
       }),
+
     });
 
     const tokens = await tokenRes.json();
     if (!tokenRes.ok) {
+
       console.error("[OAUTH TOKEN ERROR]", {
         status: tokenRes.status,
         redirectUri,
@@ -51,6 +59,7 @@ export default async function handler(req, res) {
     const lastName = profile.family_name || "";
     const picture = profile.picture || "";
 
+
     await sql`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -72,6 +81,7 @@ export default async function handler(req, res) {
       RETURNING id, email
     `;
 
+
     const secret = process.env.SESSION_SECRET;
     const session = jwt.sign(
       { sub: String(rows[0].id), email: rows[0].email, provider: "google" },
@@ -88,5 +98,6 @@ export default async function handler(req, res) {
   } catch (e) {
     console.error("[CALLBACK ERROR]", e);
     return res.status(500).json({ message: "Internal error" });
+
   }
 }

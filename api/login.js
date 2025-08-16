@@ -1,5 +1,6 @@
 // /api/login.js
 export default async function handler(req, res) {
+
   if (req.method !== "GET") return res.status(405).end();
 
   // utilise PUBLIC_BASE_URL en production (évite les preview Vercel)
@@ -8,9 +9,11 @@ export default async function handler(req, res) {
   const base = process.env.PUBLIC_BASE_URL || `${proto}://${host}`;
   const redirectUri = `${base}/api/callback`;
 
+
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID,
     redirect_uri: redirectUri,
+
     response_type: "code",
     scope: "openid email profile",
     prompt: "consent",
@@ -21,4 +24,5 @@ export default async function handler(req, res) {
   return res.redirect(
     `https://accounts.google.com/o/oauth2/v2/auth?${params}`
   );
+
 }
