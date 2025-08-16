@@ -1,11 +1,12 @@
-// api/callback.js
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 import { sql } from '@vercel/postgres';
 
 // URL de callback utilisée pour Google OAuth (prod)
 const PUBLIC_BASE_URL = "https://elegance-rho.vercel.app"; // prod
 const CALLBACK_PATH = "/api/callback";
 const REDIRECT_URI = `${PUBLIC_BASE_URL}${CALLBACK_PATH}`;
+const sessionToken = jwt.sign(payload, process.env.SESSION_SECRET, { expiresIn: "7d" });
+
 
 // Vercel Node functions get global fetch (Node 18+), no need for node-fetch
 
