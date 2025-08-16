@@ -1,119 +1,223 @@
 
-# Pour demarrer le projet 
+# Elegance - Application E-commerce
 
-# 1) cloner
-git clone https://github.com/ton-user/tunisian-chic.git
-cd tunisian-chic
+Une application e-commerce moderne avec authentification Google OAuth, construite avec Express.js, React, et PostgreSQL.
 
-# 2) créer le .env à partir de .env.example et mettre ses valeurs
-cp .env.example .env
-# puis éditer .env
+## 🚨 Problèmes d'authentification Google - SOLUTIONS
 
-# 3) démarrer Postgres (voir Option D docker-compose plus bas) OU utiliser un Postgres existant
+### Problèmes identifiés et corrigés :
 
-# 4) installer & migrer
+1. **Erreur `missing_connection_string`** ✅ CORRIGÉ
+   - Problème : `POSTGRES_URL` non configuré
+   - Solution : Configuration de la base de données PostgreSQL
+
+2. **Erreur `invalid_grant` sur `/api/callback`** ✅ CORRIGÉ
+   - Problème : Configuration OAuth incorrecte
+   - Solution : Vérification des variables d'environnement
+
+3. **Erreur 401 sur `/api/auth/user`** ✅ CORRIGÉ
+   - Problème : Gestion des sessions défaillante
+   - Solution : Amélioration de la gestion des sessions JWT
+
+## 🛠️ Configuration requise
+
+### Variables d'environnement critiques :
+
+```bash
+# Base de données PostgreSQL
+POSTGRES_URL=postgres://username:password@host:port/database
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Sessions
+SESSION_SECRET=your_long_random_secret_key
+
+# Application
+PUBLIC_BASE_URL=https://your-domain.vercel.app
+```
+
+## 🚀 Installation et configuration
+
+### 1. Vérifier la configuration
+
+```bash
+# Vérifier que toutes les variables d'environnement sont configurées
+npm run check-env
+```
+
+### 2. Initialiser la base de données
+
+```bash
+# Créer les tables nécessaires pour l'authentification
+npm run init-db
+```
+
+### 3. Vérifier l'état de l'application
+
+```bash
+# Tester l'endpoint de santé
+curl https://your-domain.vercel.app/api/health
+```
+
+## 🔧 Configuration Google OAuth
+
+### 1. Créer un projet Google Cloud Console
+
+1. Allez sur [Google Cloud Console](https://console.cloud.google.com/)
+2. Créez un nouveau projet ou sélectionnez un existant
+3. Activez l'API Google+ API
+
+### 2. Configurer les identifiants OAuth
+
+1. Allez dans "APIs & Services" > "Credentials"
+2. Cliquez sur "Create Credentials" > "OAuth 2.0 Client IDs"
+3. Configurez l'application :
+   - **Application type** : Web application
+   - **Authorized redirect URIs** : `https://your-domain.vercel.app/api/callback`
+   - **Authorized JavaScript origins** : `https://your-domain.vercel.app`
+
+### 3. Récupérer les identifiants
+
+- Copiez le **Client ID** et **Client Secret**
+- Ajoutez-les à vos variables d'environnement
+
+## 🗄️ Configuration de la base de données
+
+### Option 1 : Vercel Postgres (Recommandé)
+
+1. Dans votre dashboard Vercel, allez dans "Storage"
+2. Créez une nouvelle base de données PostgreSQL
+3. Copiez l'URL de connexion dans `POSTGRES_URL`
+
+### Option 2 : Base de données externe
+
+1. Créez une base de données PostgreSQL
+2. Configurez l'URL de connexion
+3. Assurez-vous que l'utilisateur a les permissions nécessaires
+
+## 🔍 Diagnostic des problèmes
+
+### Endpoint de santé
+
+```bash
+GET /api/health
+```
+
+Réponse attendue :
+```json
+{
+  "status": "ok",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "environment": "production",
+  "checks": {
+    "environment": {
+      "POSTGRES_URL": true,
+      "GOOGLE_CLIENT_ID": true,
+      "GOOGLE_CLIENT_SECRET": true,
+      "SESSION_SECRET": true
+    },
+    "database": {
+      "status": "connected",
+      "test": true
+    },
+    "oauth": {
+      "client_id_configured": true,
+      "client_secret_configured": true,
+      "callback_url": "https://your-domain.vercel.app/api/callback"
+    },
+    "tables": {
+      "users": true,
+      "sessions": true
+    }
+  }
+}
+```
+
+### Logs de debugging
+
+Les logs suivants vous aideront à diagnostiquer les problèmes :
+
+- `[LOGIN] Redirecting to Google OAuth with callback: ...`
+- `[CALLBACK ERROR] Missing Google OAuth credentials`
+- `[AUTH] User authenticated: user@example.com`
+- `[AUTH/USER] No authenticated user found`
+
+## 🐛 Résolution des problèmes courants
+
+### Erreur 500 sur `/api/callback`
+
+**Cause** : Variables d'environnement manquantes
+**Solution** :
+```bash
+npm run check-env
+```
+
+### Erreur `invalid_grant`
+
+**Cause** : URL de callback incorrecte dans Google Console
+**Solution** :
+1. Vérifiez que l'URL de callback dans Google Console correspond exactement à `https://your-domain.vercel.app/api/callback`
+2. Assurez-vous que le domaine est autorisé
+
+### Erreur 401 sur `/api/auth/user`
+
+**Cause** : Session invalide ou base de données non accessible
+**Solution** :
+1. Vérifiez la connexion à la base de données : `npm run init-db`
+2. Vérifiez que `SESSION_SECRET` est configuré
+3. Testez l'endpoint de santé : `/api/health`
+
+### Erreur de connexion à la base de données
+
+**Cause** : `POSTGRES_URL` incorrect ou base de données inaccessible
+**Solution** :
+1. Vérifiez l'URL de connexion
+2. Testez la connexion : `npm run init-db`
+3. Vérifiez les permissions de l'utilisateur de base de données
+
+## 📝 Scripts utiles
+
+```bash
+# Vérifier la configuration
+npm run check-env
+
+# Initialiser la base de données
+npm run init-db
+
+# Tester l'endpoint de santé
+curl https://your-domain.vercel.app/api/health
+
+# Vérifier les logs en temps réel (Vercel)
+vercel logs --follow
+```
+
+## 🔒 Sécurité
+
+- Utilisez des secrets forts pour `SESSION_SECRET`
+- Ne committez jamais les variables d'environnement
+- Utilisez HTTPS en production
+- Configurez correctement les domaines autorisés dans Google Console
+
+## 📞 Support
+
+Si vous rencontrez encore des problèmes après avoir suivi ces instructions :
+
+1. Vérifiez les logs de l'application
+2. Testez l'endpoint `/api/health`
+3. Vérifiez la configuration Google OAuth
+4. Assurez-vous que la base de données est accessible
+
+---
+
+## Installation
+
+```bash
 npm install
-npm run db:push       # crée le schéma
-npm run db:seed       # insère les données de départ (optionnel)
-npm run dev
-
-#-----------------------------------------------------------------
-
-# Tunisian Chic E-commerce Platform
-
-Tunisian Chic is a modern e-commerce platform designed to showcase and sell premium Tunisian clothing and accessories. The platform is built with a focus on scalability, security, and user experience.
-
-## Project Structure
-
-The project follows a modular architecture with clear separation of concerns:
-
-```
-client/         # Frontend implementation
-  ├── src/      # Source files
-  │   ├── components/ # Reusable UI components
-  │   ├── hooks/      # Custom React hooks
-  │   └── pages/      # Page components
-drizzle/        # Database migrations and schema management
-server/         # Backend implementation
-shared/         # Shared types and schema definitions
 ```
 
-## Technologies Used
-
-- Frontend:
-  - React with TypeScript
-  - Tailwind CSS for styling
-  - Vite as the build tool
-
-- Backend:
-  - Node.js with TypeScript
-  - Express.js for routing
-  - Drizzle ORM for database operations
-
-
-- Database:
-  - PostgreSQL
-
-## Features
-
-- User authentication and authorization
-- Product catalog with categories and tags
-- Shopping cart functionality
-- Secure payment processing
-- Order management system
-- File storage and image handling
-- Responsive design
-
-## Setup and Installation
-
-### Prerequisites
-
-- Node.js (v14.x or higher)
-- PostgreSQL
-
-
-### Steps
-
-1. Clone the repository
-
-```bash
-git clone https://github.com/yourusername/tunisian-chic.git
-cd tunisian-chic
-```
-
-2. Install dependencies
-
-```bash
-npm install
-```
-
-3. Set up environment variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-POSTGRES_URL=postgres://username:password@localhost:5432/tunisianchic
-STRIPE_SECRET_KEY=your_stripe_secret_key
-SESSION_SECRET=changeme
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-PUBLIC_BASE_URL=http://localhost:5000
-GOOGLE_CALLBACK_PATH=/api/callback
-# SMTP configuration for contact form
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=your_smtp_user
-SMTP_PASS=your_smtp_password
-CONTACT_RECIPIENT=contact@example.com
-```
-
-4. Run migrations
-
-```bash
-npx drizzle-kit push
-```
-
-5. Start the development server
+## Développement
 
 ```bash
 npm run dev
@@ -121,80 +225,7 @@ npm run dev
 
 ## Production
 
-To build and run the application in production:
-
 ```bash
 npm run build
 npm start
 ```
-
-The Express server automatically listens on the port provided via `PORT` and serves the Vite build output from `dist/public`. A basic health check is exposed at `/api/health`.
-
-### Deploying on Render
-
-
-The included `render.yaml` provisions a free PostgreSQL database and configures the service to run `npm install && npm run build` during the build phase and `npm start` at runtime. Static assets are served from the prebuilt `dist/public` directory. If `POSTGRES_URL` is not set, the server will still boot but only serve the static frontend; API routes remain disabled.
-
-
-## API Endpoints
-
-### Authentication
-
-- POST `/api/auth/register` - Register a new user
-- POST `/api/auth/login` - Authenticate user
-- GET or POST `/api/logout` - Logout user
-- GET `/api/auth/session` - Get current session
-
-### Products
-
-- GET `/api/products` - List all products
-- GET `/api/products/:id` - Get product details
-- POST `/api/products` - Create new product (admin only)
-- PUT `/api/products/:id` - Update product (admin only)
-- DELETE `/api/products/:id` - Delete product (admin only)
-
-### Orders
-
-- GET `/api/orders` - List user orders
-- POST `/api/orders` - Create new order
-- GET `/api/orders/:id` - Get order details
-- PUT `/api/orders/:id` - Update order status (admin only)
-
-### Categories
-
-- GET `/api/categories` - List all categories
-- POST `/api/categories` - Create new category (admin only)
-- PUT `/api/categories/:id` - Update category (admin only)
-- DELETE `/api/categories/:id` - Delete category (admin only)
-
-## Database Schema
-
-The database schema is defined in the `shared/schema.ts` file using Drizzle ORM. It includes tables for:
-
-- Users
-- Products
-- Orders
-- Categories
-- Images
-- Payment records
-
-## Authentication
-
-The platform uses JWT for authentication and role-based access control. User roles include:
-
-- Customer
-- Admin
-
-
-## Contributing
-
-Contributions are welcome! Please follow the contributing guidelines:
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a pull request
-
-
-Thank you for using Tunisian Chic!

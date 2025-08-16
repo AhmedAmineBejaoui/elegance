@@ -15,7 +15,11 @@
     "vercel-build": "npm run build",
     "seed": "tsx server/seed.ts",
     "check": "tsc",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "check-env": "node scripts/check-env.js",
+    "init-db": "node scripts/init-db.js",
+    "test-auth": "node scripts/test-auth.js",
+    "generate-secret": "node scripts/generate-secret.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
