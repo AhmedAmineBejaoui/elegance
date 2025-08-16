@@ -1,7 +1,6 @@
 import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -11,10 +10,8 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Early return if database is not configured
   if (!process.env.POSTGRES_URL) {
-    res.status(503).json({ message: 'Database not configured' });
-    return;
+    return res.status(200).json({ items: [] });
   }
 
   try {
