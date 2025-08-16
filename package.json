@@ -19,7 +19,8 @@
     "check-env": "node scripts/check-env.js",
     "init-db": "node scripts/init-db.js",
     "test-auth": "node scripts/test-auth.js",
-    "generate-secret": "node scripts/generate-secret.js"
+    "generate-secret": "node scripts/generate-secret.js",
+    "test-neon": "node scripts/test-neon.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

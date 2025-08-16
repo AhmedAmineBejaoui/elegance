@@ -30,6 +30,15 @@ function testConfiguration() {
     }
   });
 
+  // Vérifier spécifiquement Neon
+  if (config.POSTGRES_URL) {
+    const isNeon = config.POSTGRES_URL.includes('neon.tech');
+    console.log(`\n🗄️  Base de données: ${isNeon ? 'Neon PostgreSQL' : 'PostgreSQL'}`);
+    if (isNeon) {
+      console.log('✅ Neon détecté - Configuration recommandée pour Vercel');
+    }
+  }
+
   // Vérifier la configuration OAuth
   console.log('\n🔧 Configuration OAuth:');
   if (config.GOOGLE_CLIENT_ID && config.GOOGLE_CLIENT_SECRET) {
@@ -55,11 +64,24 @@ function testConfiguration() {
   // Vérifier la base de données
   console.log('\n🗄️  Configuration de la base de données:');
   if (config.POSTGRES_URL) {
-    console.log('✅ POSTGRES_URL configuré');
+    const isNeon = config.POSTGRES_URL.includes('neon.tech');
+    console.log(`✅ POSTGRES_URL configuré (${isNeon ? 'Neon' : 'PostgreSQL'})`);
     console.log('📝 Pour tester la connexion: npm run init-db');
+    
+    if (isNeon) {
+      console.log('\n💡 Neon PostgreSQL - Avantages:');
+      console.log('- Hébergement serverless optimisé');
+      console.log('- Connexions automatiquement gérées');
+      console.log('- Intégration native avec Vercel');
+      console.log('- Monitoring et logs intégrés');
+    }
   } else {
     console.log('❌ POSTGRES_URL manquant');
     console.log('📝 Configurez une base de données PostgreSQL');
+    console.log('\n💡 Recommandation: Utilisez Neon PostgreSQL');
+    console.log('1. Allez sur https://console.neon.tech/');
+    console.log('2. Créez un nouveau projet');
+    console.log('3. Copiez l\'URL de connexion');
   }
 
   // Vérifier les sessions
@@ -96,6 +118,15 @@ function testConfiguration() {
   console.log('   - Vérifiez SESSION_SECRET');
   console.log('   - Vérifiez la connexion à la base de données');
   console.log('   - Testez l\'endpoint de santé: /api/health');
+  
+  // Conseils spécifiques pour Neon
+  if (config.POSTGRES_URL && config.POSTGRES_URL.includes('neon.tech')) {
+    console.log('\n🔧 Conseils spécifiques pour Neon:');
+    console.log('✅ Votre base de données est sur Neon - Configuration optimale');
+    console.log('📊 Surveillez l\'utilisation dans Neon Console');
+    console.log('🔒 Vérifiez les paramètres de sécurité Neon');
+    console.log('📈 Utilisez les logs Neon pour le debugging');
+  }
 }
 
 // Exécuter le test

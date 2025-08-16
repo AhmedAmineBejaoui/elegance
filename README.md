@@ -24,8 +24,9 @@ Une application e-commerce moderne avec authentification Google OAuth, construit
 ### Variables d'environnement critiques :
 
 ```bash
-# Base de données PostgreSQL
+# Base de données PostgreSQL (Recommandé: Neon)
 POSTGRES_URL=postgres://username:password@host:port/database
+# Exemple Neon: postgres://user:password@ep-xxx-xxx-xxx.region.aws.neon.tech/database
 
 # Google OAuth
 GOOGLE_CLIENT_ID=your_google_client_id
@@ -85,13 +86,24 @@ curl https://your-domain.vercel.app/api/health
 
 ## 🗄️ Configuration de la base de données
 
-### Option 1 : Vercel Postgres (Recommandé)
+### Option 1 : Neon PostgreSQL (Recommandé pour Vercel) ⭐
+
+1. Allez sur [Neon Console](https://console.neon.tech/)
+2. Créez un nouveau projet ou sélectionnez un existant
+3. Copiez l'URL de connexion dans `POSTGRES_URL`
+4. **Avantages Neon :**
+   - Hébergement serverless optimisé
+   - Intégration native avec Vercel
+   - Connexions automatiquement gérées
+   - Monitoring et logs intégrés
+
+### Option 2 : Vercel Postgres
 
 1. Dans votre dashboard Vercel, allez dans "Storage"
 2. Créez une nouvelle base de données PostgreSQL
 3. Copiez l'URL de connexion dans `POSTGRES_URL`
 
-### Option 2 : Base de données externe
+### Option 3 : Base de données externe
 
 1. Créez une base de données PostgreSQL
 2. Configurez l'URL de connexion
@@ -177,6 +189,12 @@ npm run check-env
 2. Testez la connexion : `npm run init-db`
 3. Vérifiez les permissions de l'utilisateur de base de données
 
+**Pour Neon spécifiquement :**
+1. Vérifiez que l'URL de connexion Neon est correcte
+2. Assurez-vous que le projet Neon est actif
+3. Vérifiez les paramètres de sécurité dans Neon Console
+4. Testez la connexion depuis le dashboard Neon
+
 ## 📝 Scripts utiles
 
 ```bash
@@ -185,6 +203,12 @@ npm run check-env
 
 # Initialiser la base de données
 npm run init-db
+
+# Tester l'authentification
+npm run test-auth
+
+# Générer un secret de session
+npm run generate-secret
 
 # Tester l'endpoint de santé
 curl https://your-domain.vercel.app/api/health
@@ -208,6 +232,11 @@ Si vous rencontrez encore des problèmes après avoir suivi ces instructions :
 2. Testez l'endpoint `/api/health`
 3. Vérifiez la configuration Google OAuth
 4. Assurez-vous que la base de données est accessible
+
+**Pour Neon :**
+- Surveillez l'utilisation dans Neon Console
+- Vérifiez les paramètres de sécurité Neon
+- Utilisez les logs Neon pour le debugging
 
 ---
 

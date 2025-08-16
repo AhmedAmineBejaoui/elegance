@@ -20,6 +20,11 @@ POSTGRES_URL=postgres://username:password@host:port/database
 npm run init-db
 ```
 
+**Pour Neon spécifiquement :**
+1. Allez sur https://console.neon.tech/
+2. Créez un nouveau projet ou sélectionnez un existant
+3. Copiez l'URL de connexion (format : `postgres://user:password@ep-xxx-xxx-xxx.region.aws.neon.tech/database`)
+
 ### 2. Erreur `invalid_grant` (400 sur `/api/callback`)
 
 **Symptômes :**
@@ -151,7 +156,13 @@ Si les problèmes persistent :
    - Tables créées
    - Permissions utilisateur
 
-## 🚀 Déploiement sur Vercel
+**Pour Neon spécifiquement :**
+- Surveillez l'utilisation dans Neon Console
+- Vérifiez les paramètres de sécurité Neon
+- Utilisez les logs Neon pour le debugging
+- Testez la connexion depuis le dashboard Neon
+
+## 🚀 Déploiement sur Vercel avec Neon
 
 ### Variables d'environnement Vercel :
 
@@ -161,14 +172,37 @@ Si les problèmes persistent :
 
 ### Ordre de configuration recommandé :
 
-1. Configurez `POSTGRES_URL` (Vercel Postgres recommandé)
-2. Configurez `GOOGLE_CLIENT_ID` et `GOOGLE_CLIENT_SECRET`
-3. Générez et configurez `SESSION_SECRET`
-4. Configurez `PUBLIC_BASE_URL` (optionnel)
-5. Redéployez l'application
-6. Testez avec `/api/health`
-7. Testez l'authentification Google
+1. **Configurez Neon PostgreSQL :**
+   - Allez sur https://console.neon.tech/
+   - Créez un nouveau projet
+   - Copiez l'URL de connexion dans `POSTGRES_URL`
+
+2. **Configurez Google OAuth :**
+   - Configurez `GOOGLE_CLIENT_ID` et `GOOGLE_CLIENT_SECRET`
+   - Vérifiez l'URL de callback dans Google Console
+
+3. **Configurez les sessions :**
+   - Générez et configurez `SESSION_SECRET` avec `npm run generate-secret`
+
+4. **Configurez l'application :**
+   - Configurez `PUBLIC_BASE_URL` (optionnel)
+
+5. **Déployez et testez :**
+   - Redéployez l'application sur Vercel
+   - Testez avec `/api/health`
+   - Testez l'authentification Google
+
+### Avantages de Neon avec Vercel :
+
+- ✅ Hébergement serverless optimisé
+- ✅ Intégration native avec Vercel
+- ✅ Connexions automatiquement gérées
+- ✅ Monitoring et logs intégrés
+- ✅ Pas de configuration de pool de connexions
+- ✅ Mise à l'échelle automatique
 
 ---
 
 **💡 Conseil :** Commencez toujours par `npm run check-env` pour identifier les variables manquantes !
+
+**🌟 Recommandation :** Neon PostgreSQL est la solution optimale pour Vercel !

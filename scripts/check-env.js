@@ -56,10 +56,23 @@ console.log('\n🔧 Configuration de l\'application:');
 console.log(`🌍 NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
 console.log(`🔗 PUBLIC_BASE_URL: ${process.env.PUBLIC_BASE_URL || 'Auto-détecté'}`);
 
+// Vérifier spécifiquement Neon
+if (process.env.POSTGRES_URL) {
+  const isNeon = process.env.POSTGRES_URL.includes('neon.tech');
+  console.log(`🗄️  Base de données: ${isNeon ? 'Neon PostgreSQL' : 'PostgreSQL'}`);
+  if (isNeon) {
+    console.log('✅ Neon détecté - Configuration recommandée pour Vercel');
+  }
+}
+
 if (hasErrors) {
   console.log('\n❌ ERREUR: Variables d\'environnement manquantes!');
   console.log('📝 Veuillez configurer les variables manquantes dans votre fichier .env');
   console.log('📖 Consultez .env.example pour un exemple de configuration');
+  console.log('\n💡 Pour Neon:');
+  console.log('1. Allez sur https://console.neon.tech/');
+  console.log('2. Créez un nouveau projet ou sélectionnez un existant');
+  console.log('3. Copiez l\'URL de connexion dans POSTGRES_URL');
   process.exit(1);
 } else {
   console.log('\n✅ Toutes les variables d\'environnement critiques sont configurées!');
