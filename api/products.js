@@ -5,27 +5,33 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
+
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
 
+  // Early return if database is not configured
+  if (!process.env.POSTGRES_URL) {
+    res.status(503).json({ message: 'Database not configured' });
+    return;
+  }
+
   try {
     if (req.method === 'GET') {
-      const { isFeatured, limit = 8 } = req.query;
-      
-      let query = `SELECT p.*, c.name as category_name FROM products p 
-                   LEFT JOIN categories c ON p.category_id = c.id 
-                   WHERE p.is_active = true`;
-      
-      if (isFeatured === 'true') {
-        query += ` AND p.is_featured = true`;
-      }
-      
-      query += ` ORDER BY p.created_at DESC LIMIT ${parseInt(limit)}`;
-      
-      const products = await sql.unsafe(query);
+      const { isFeatured, limit } = req.query;
+      const limitValue = Number.parseInt(limit, 10) || 8;
+
+      const products = await sql`
+        SELECT p.*, c.name as category_name
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE p.is_active = true
+        ${isFeatured === 'true' ? sql`AND p.is_featured = true` : sql``}
+        ORDER BY p.created_at DESC
+        LIMIT ${limitValue}
+      `;
+
       res.status(200).json({ items: products.rows });
     } else {
       res.status(405).json({ message: 'Method not allowed' });
