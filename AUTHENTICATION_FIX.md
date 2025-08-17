@@ -2,37 +2,40 @@
 
 ## Problèmes identifiés
 
-1. **Conflit entre deux systèmes d'authentification** : Passport.js (serveur) et JWT (API Vercel)
-2. **Erreurs 401/500** : Les routes API ne reconnaissaient pas l'utilisateur authentifié
-3. **Redirection incorrecte** : Après l'authentification Google, l'utilisateur n'était pas reconnu
+1. **Erreurs 500 sur Vercel** : Les API Vercel ne fonctionnaient pas correctement
+2. **Conflit entre systèmes d'authentification** : Passport.js (serveur) et JWT (API Vercel)
+3. **Problèmes de middleware** : Les middlewares ne fonctionnaient pas sur Vercel
 
 ## Solutions implémentées
 
-### 1. Unification du système d'authentification
+### 1. Simplification des API Vercel
 
 **Fichiers modifiés :**
-- `server/auth.ts` : Ajout du middleware JWT en plus de Passport
-- `api/callback.js` : Création/récupération de l'utilisateur en base de données
-- `api/auth-middleware.js` : Nouveau middleware d'authentification pour les API Vercel
+- `api/auth/user.js` : API autonome sans middleware
+- `api/products.js` : API autonome sans middleware
+- `api/callback.js` : Callback Google simplifié
+- `api/login.js` : Redirection Google simplifiée
+- `api/logout.js` : Déconnexion simplifiée
+- `api/test.js` : Nouvelle API de diagnostic
 
-### 2. Gestion des cookies
+### 2. Suppression des middlewares complexes
 
-**Fichiers modifiés :**
-- `api/index.js` : Middleware pour parser les cookies
-- `api/products.js` : Ajout du middleware withCookies
-- `api/auth/user.js` : Nouvelle API pour récupérer l'utilisateur
-- `api/logout.js` : API de déconnexion améliorée
+**Fichiers supprimés :**
+- `api/index.js` : Middleware cookies
+- `api/auth-middleware.js` : Middleware d'authentification
 
-### 3. Amélioration du frontend
+### 3. Gestion directe des cookies
 
-**Fichiers modifiés :**
-- `client/src/hooks/useAuth.ts` : Détection automatique de l'authentification réussie
+Chaque API gère maintenant directement :
+- Le parsing des cookies
+- La vérification JWT
+- La gestion des erreurs
 
 ## Configuration requise
 
 ### Variables d'environnement
 
-Assurez-vous d'avoir ces variables dans votre `.env` :
+Assurez-vous d'avoir ces variables dans Vercel :
 
 ```env
 # Google OAuth
@@ -46,32 +49,22 @@ DATABASE_URL=your_database_url
 SESSION_SECRET=your_session_secret
 
 # URLs
-PUBLIC_BASE_URL=https://your-domain.vercel.app
+PUBLIC_BASE_URL=https://elegance-ten.vercel.app
 ```
 
-### Configuration Google OAuth
+## Diagnostic
 
-1. Allez sur [Google Cloud Console](https://console.cloud.google.com/)
-2. Créez un projet ou sélectionnez un projet existant
-3. Activez l'API Google+ API
-4. Créez des identifiants OAuth 2.0
-5. Ajoutez l'URL de redirection : `https://your-domain.vercel.app/api/callback`
+### Test de l'API de diagnostic
 
-## Test de l'authentification
-
-### 1. Test manuel
-
-1. Allez sur votre site
-2. Cliquez sur "Se connecter avec Google"
-3. Authentifiez-vous avec Google
-4. Vous devriez être redirigé vers la page d'accueil avec `?auth=success`
-5. Vérifiez que vous êtes connecté (nom d'utilisateur visible, panier accessible)
-
-### 2. Test automatisé
-
-```bash
-node test-auth.js
+Visitez cette URL pour diagnostiquer les problèmes :
 ```
+https://elegance-ten.vercel.app/api/test
+```
+
+Cette API vérifie :
+- Variables d'environnement
+- Connexion à la base de données
+- Configuration générale
 
 ## Flux d'authentification
 
@@ -87,35 +80,36 @@ node test-auth.js
 
 ## Dépannage
 
+### Erreur 500 "Internal Server Error"
+
+1. **Vérifiez l'API de test** : `https://elegance-ten.vercel.app/api/test`
+2. **Vérifiez les variables d'environnement** dans Vercel
+3. **Vérifiez la connexion à la base de données**
+4. **Redéployez l'application** après correction
+
 ### Erreur 401 "Unauthorized"
 
 - Vérifiez que `SESSION_SECRET` est défini
 - Vérifiez que le cookie `session` est présent
 - Vérifiez que la base de données est accessible
 
-### Erreur 500 "Database error"
+### Erreur de base de données
 
 - Vérifiez que `DATABASE_URL` est correct
-- Vérifiez que la table `users` existe
+- Vérifiez que les tables existent
 - Vérifiez les logs de la base de données
-
-### Redirection en boucle
-
-- Vérifiez que l'URL de callback Google correspond à `/api/callback`
-- Vérifiez que `PUBLIC_BASE_URL` est correct
 
 ## Structure des fichiers
 
 ```
 api/
-├── auth-middleware.js    # Middleware d'authentification JWT
 ├── auth/
 │   └── user.js          # API utilisateur authentifié
 ├── callback.js          # Callback Google OAuth
-├── index.js             # Middleware cookies
 ├── login.js             # Redirection Google
 ├── logout.js            # Déconnexion
-└── products.js          # API produits (avec auth)
+├── products.js          # API produits
+└── test.js              # API de diagnostic
 
 server/
 ├── auth.ts              # Configuration Passport + JWT
@@ -127,7 +121,16 @@ client/src/hooks/
 
 ## Notes importantes
 
-- Le système utilise maintenant JWT pour les API Vercel et Passport pour le serveur local
-- Les cookies sont automatiquement gérés par le middleware
+- Les API Vercel sont maintenant autonomes et ne dépendent plus de middlewares
+- Chaque API gère directement ses propres erreurs
 - L'authentification est persistante pendant 7 jours
 - Le frontend détecte automatiquement les nouvelles authentifications
+- Utilisez `/api/test` pour diagnostiquer les problèmes
+
+## Prochaines étapes
+
+1. Redéployez votre application sur Vercel
+2. Testez l'API de diagnostic : `/api/test`
+3. Corrigez les variables d'environnement si nécessaire
+4. Testez l'authentification Google
+5. Vérifiez que les produits s'affichent correctement

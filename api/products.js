@@ -1,5 +1,4 @@
 import { createPool } from '@vercel/postgres';
-import { withCookies } from './index.js';
 
 // Lazily create the pool only if a database URL is provided. This avoids
 // crashing the API at import time when running in environments without a
@@ -9,7 +8,7 @@ const db = DATABASE_URL
   ? createPool({ connectionString: DATABASE_URL })
   : null;
 
-async function productsHandler(req, res) {
+export default async function handler(req, res) {
   const origin = req.headers.origin || '*';
   res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Vary', 'Origin');
@@ -70,5 +69,3 @@ async function productsHandler(req, res) {
     });
   }
 }
-
-export default withCookies(productsHandler);

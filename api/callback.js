@@ -1,9 +1,8 @@
 // /api/callback.js
 import jwt from "jsonwebtoken";
 import { createPool } from '@vercel/postgres';
-import { withCookies } from './index.js';
 
-async function callbackHandler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
     return res.status(405).json({ message: "Method not allowed" });
@@ -99,5 +98,3 @@ async function callbackHandler(req, res) {
     return res.status(500).json({ message: "Internal error", error: String(e) });
   }
 }
-
-export default withCookies(callbackHandler);

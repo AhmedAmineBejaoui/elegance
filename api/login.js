@@ -1,6 +1,4 @@
-import { withCookies } from './index.js';
-
-async function loginHandler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'GET') {
     res.setHeader('Allow', ['GET']);
     return res.status(405).json({ message: 'Method not allowed' });
@@ -37,5 +35,3 @@ async function loginHandler(req, res) {
     res.status(500).json({ message: 'Internal server error' });
   }
 }
-
-export default withCookies(loginHandler);
