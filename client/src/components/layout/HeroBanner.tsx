@@ -4,7 +4,7 @@ import { Link } from "wouter";
 
 export function HeroBanner() {
   return (
-    <div className="relative h-[80vh] w-full bg-cover bg-center bg-[url('/images/hero.jpg')] flex items-center justify-center">
+    <div className="relative h-[80vh] w-full bg-cover bg-center bg-[url('/images/hero-banner.jpg')] flex items-center justify-center">
       <div className="bg-black/50 text-white p-8 text-center rounded max-w-xl">
         <h1 className="text-4xl md:text-5xl font-light mb-4">Nouvelle Collection 2025</h1>
         <p className="mb-6 text-lg">
