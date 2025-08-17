@@ -1,6 +1,12 @@
 // /api/auth/user.js
 import jwt from "jsonwebtoken";
-import { sql } from "@vercel/postgres";
+import { createPool } from "@vercel/postgres";
+
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error("DATABASE_URL is not set");
+}
+const db = createPool({ connectionString: DATABASE_URL });
 
 /** Récupère une valeur de cookie depuis l'en-tête "cookie" */
 function getCookie(name, cookieHeader = "") {
@@ -20,7 +26,7 @@ function readSessionToken(req) {
 async function fetchUserById(id) {
   // 1) Essaye avec la colonne "role"
   try {
-    const { rows } = await sql`
+    const { rows } = await db.sql`
       SELECT id, email, first_name, last_name, avatar_url, role
       FROM users
       WHERE id = ${id}
@@ -31,7 +37,7 @@ async function fetchUserById(id) {
     // 2) Si la colonne n'existe pas encore => fallback sans "role"
     // code SQLSTATE '42703' = undefined_column
     if (err?.code === "42703") {
-      const { rows } = await sql`
+      const { rows } = await db.sql`
         SELECT id, email, first_name, last_name, avatar_url
         FROM users
         WHERE id = ${id}

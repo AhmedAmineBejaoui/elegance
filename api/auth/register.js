@@ -1,7 +1,13 @@
-import { sql } from '@vercel/postgres';
+import { createPool } from '@vercel/postgres';
 import bcrypt from 'bcryptjs';
 
 export const config = { runtime: 'nodejs' };
+
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error('DATABASE_URL is not set');
+}
+const db = createPool({ connectionString: DATABASE_URL });
 
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -23,12 +29,6 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Early return if database is not configured
-  if (!process.env.DATABASE_URL) {
-    res.status(503).json({ message: 'Database not configured' });
-    return;
-  }
-
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body;
     const { firstName, lastName, email, password } = body;
@@ -37,14 +37,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const { rows: existingUsers } = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
+    const { rows: existingUsers } = await db.sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
     if (existingUsers.length > 0) {
       return res.status(409).json({ message: 'User already exists with this email' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const { rows: newUsers } = await sql`
+    const { rows: newUsers } = await db.sql`
       INSERT INTO users (email, password_hash, first_name, last_name, role, created_at, updated_at)
       VALUES (${email}, ${hashedPassword}, ${firstName}, ${lastName}, 'customer', NOW(), NOW())
       RETURNING id, email, first_name, last_name, role
