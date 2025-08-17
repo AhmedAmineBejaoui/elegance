@@ -1,0 +1,18 @@
+
+databases:
+  - name: elegance-db
+    plan: free
+
+
+services:
+  - type: web
+    name: elegance
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.16.0
+
+      - key: POSTGRES_URL
+        fromDatabase: elegance-db
