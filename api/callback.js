@@ -51,10 +51,17 @@ export default async function handler(req, res) {
 
     const sessionToken = jwt.sign(payload, secret, { expiresIn: "7d" });
 
-    res.setHeader(
-      "Set-Cookie",
-      `session=${sessionToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
-    );
+    const isProd = process.env.NODE_ENV === "production";
+    const cookieParts = [
+      `session=${sessionToken}`,
+      "Path=/",
+      "HttpOnly",
+      isProd ? "Secure" : undefined,
+      "SameSite=Lax",
+      `Max-Age=${7 * 24 * 60 * 60}`,
+    ].filter(Boolean);
+
+    res.setHeader("Set-Cookie", cookieParts.join("; "));
 
     return res.redirect(302, "/");
   } catch (e) {
