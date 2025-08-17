@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  if (!process.env.POSTGRES_URL) {
+  if (!process.env.DATABASE_URL) {
     return res.status(200).json({ items: [] });
   }
 
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     res.status(500).json({
       message: 'Database error',
       error: error.message,
-      hasDatabase: !!process.env.POSTGRES_URL
+      hasDatabase: !!process.env.DATABASE_URL
     });
   }
 }
