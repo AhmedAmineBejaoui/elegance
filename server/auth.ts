@@ -7,12 +7,44 @@ import { createPool } from "@vercel/postgres";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { storage } from "./storage";
 
 // URL de callback utilisée pour Google OAuth (prod)
 const PUBLIC_BASE_URL = "https://elegance-rho.vercel.app"; // prod
 const CALLBACK_PATH = "/api/callback";
 const REDIRECT_URI = `${PUBLIC_BASE_URL}${CALLBACK_PATH}`;
+
+// Middleware pour vérifier les tokens JWT
+const verifyJWT = (req: any, res: any, next: any) => {
+  const token = req.cookies?.session;
+  
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const secret = process.env.SESSION_SECRET;
+    if (!secret) {
+      return next();
+    }
+
+    const decoded = jwt.verify(token, secret) as any;
+    if (decoded && decoded.sub) {
+      req.user = {
+        id: decoded.sub,
+        email: decoded.email,
+        firstName: decoded.firstName,
+        lastName: decoded.lastName,
+        provider: decoded.provider
+      };
+    }
+  } catch (error) {
+    console.error("JWT verification failed:", error);
+  }
+  
+  next();
+};
 
 export async function setupAuth(app: Express): Promise<void> {
   const {
@@ -64,6 +96,9 @@ export async function setupAuth(app: Express): Promise<void> {
 
   app.use(passport.initialize());
   app.use(passport.session());
+  
+  // Ajouter le middleware JWT après Passport
+  app.use(verifyJWT);
 
   // ---- Strategies ----
   passport.use(
@@ -166,6 +201,8 @@ export async function setupAuth(app: Express): Promise<void> {
   // Logout (GET et POST)
   const logoutHandler = (req: any, res: any) => {
     req.logout(() => {
+      // Supprimer le cookie JWT aussi
+      res.clearCookie('session');
       if (req.method === "GET") res.redirect("/");
       else res.json({ success: true });
     });
@@ -177,6 +214,8 @@ export async function setupAuth(app: Express): Promise<void> {
 }
 
 export const isAuthenticated: RequestHandler = (req, res, next) => {
+  // Vérifier si l'utilisateur est authentifié via Passport ou JWT
   if (req.isAuthenticated && req.isAuthenticated()) return next();
+  if (req.user) return next(); // JWT authentication
   return res.status(401).json({ message: "Unauthorized" });
 };

@@ -1,7 +1,9 @@
 // /api/callback.js
 import jwt from "jsonwebtoken";
+import { createPool } from '@vercel/postgres';
+import { withCookies } from './index.js';
 
-export default async function handler(req, res) {
+async function callbackHandler(req, res) {
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
     return res.status(405).json({ message: "Method not allowed" });
@@ -43,8 +45,35 @@ export default async function handler(req, res) {
     const email = profile.email;
     if (!email) return res.status(400).json({ message: "Google profile has no email" });
 
-    // Si tu n'utilises pas encore la DB, on peut mettre l'email comme sub
-    const payload = { sub: email, email, provider: "google" };
+    // Créer ou récupérer l'utilisateur dans la base de données
+    const db = createPool({ connectionString: process.env.DATABASE_URL });
+    
+    // Vérifier si l'utilisateur existe déjà
+    const existingUser = await db.sql`
+      SELECT * FROM users WHERE email = ${email}
+    `;
+
+    let user;
+    if (existingUser.rows.length > 0) {
+      user = existingUser.rows[0];
+    } else {
+      // Créer un nouvel utilisateur
+      const newUser = await db.sql`
+        INSERT INTO users (email, first_name, last_name, profile_image_url, created_at, updated_at)
+        VALUES (${email}, ${profile.given_name || null}, ${profile.family_name || null}, ${profile.picture || null}, NOW(), NOW())
+        RETURNING *
+      `;
+      user = newUser.rows[0];
+    }
+
+    // Créer un token JWT avec les informations de l'utilisateur
+    const payload = { 
+      sub: user.id, 
+      email: user.email, 
+      provider: "google",
+      firstName: user.first_name,
+      lastName: user.last_name
+    };
 
     const secret = process.env.SESSION_SECRET;
     if (!secret) return res.status(500).json({ step: "jwt", message: "SESSION_SECRET missing" });
@@ -63,9 +92,12 @@ export default async function handler(req, res) {
 
     res.setHeader("Set-Cookie", cookieParts.join("; "));
 
-    return res.redirect(302, "/");
+    // Rediriger vers la page d'accueil avec un paramètre de succès
+    return res.redirect(302, "/?auth=success");
   } catch (e) {
     console.error("[CALLBACK CRASH]", e);
     return res.status(500).json({ message: "Internal error", error: String(e) });
   }
 }
+
+export default withCookies(callbackHandler);
