@@ -1,18 +1,28 @@
 import { createPool } from '@vercel/postgres';
 
+// Lazily create the pool only if a database URL is provided. This avoids
+// crashing the API at import time when running in environments without a
+// database configured (e.g. local demos).
 const DATABASE_URL = process.env.DATABASE_URL;
-if (!DATABASE_URL) {
-  throw new Error('DATABASE_URL is not set');
-}
-const db = createPool({ connectionString: DATABASE_URL });
+const db = DATABASE_URL
+  ? createPool({ connectionString: DATABASE_URL })
+  : null;
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin || '*';
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
+    return;
+  }
+
+  if (!db) {
+    res.status(500).json({ message: 'Database not configured', hasDatabase: false });
     return;
   }
 
