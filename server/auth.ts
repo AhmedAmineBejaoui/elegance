@@ -11,7 +11,7 @@ import jwt from "jsonwebtoken";
 import { storage } from "./storage";
 
 // URL de callback utilisée pour Google OAuth (prod)
-const PUBLIC_BASE_URL = "https://elegance-rho.vercel.app"; // prod
+const PUBLIC_BASE_URL = "https://elegance-ten.vercel.app"; // prod
 const CALLBACK_PATH = "/api/callback";
 const REDIRECT_URI = `${PUBLIC_BASE_URL}${CALLBACK_PATH}`;
 
