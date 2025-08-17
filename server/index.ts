@@ -60,12 +60,12 @@ app.get("/api/health", (_req: Request, res: Response) => {
 });
 
 // Routes will be registered in serverless handler or local dev
-if (process.env.NODE_ENV === "development" && process.env.POSTGRES_URL) {
+if (process.env.NODE_ENV === "development" && process.env.DATABASE_URL) {
   const { registerRoutes } = await import("./routes");
   await registerRoutes(app);
   log("Routes registered for development");
-} else if (!process.env.POSTGRES_URL) {
-  log("POSTGRES_URL not set, API routes disabled", "warn");
+} else if (!process.env.DATABASE_URL) {
+  log("DATABASE_URL not set, API routes disabled", "warn");
 } else {
   log("Production mode - routes will be registered by serverless handler");
 }

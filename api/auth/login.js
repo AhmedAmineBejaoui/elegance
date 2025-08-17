@@ -24,7 +24,7 @@ export default async function handler(req, res) {
   }
 
   // Early return if database is not configured
-  if (!process.env.POSTGRES_URL) {
+  if (!process.env.DATABASE_URL) {
     res.status(503).json({ message: 'Database not configured' });
     return;
   }

@@ -92,7 +92,7 @@ npm install
 Create a `.env` file in the root directory with the following variables:
 
 ```env
-POSTGRES_URL=postgres://username:password@localhost:5432/tunisianchic
+DATABASE_URL=postgres://username:password@localhost:5432/tunisianchic
 STRIPE_SECRET_KEY=your_stripe_secret_key
 SESSION_SECRET=changeme
 GOOGLE_CLIENT_ID=your-google-client-id
@@ -133,7 +133,7 @@ The Express server automatically listens on the port provided via `PORT` and ser
 ### Deploying on Render
 
 
-The included `render.yaml` provisions a free PostgreSQL database and configures the service to run `npm install && npm run build` during the build phase and `npm start` at runtime. Static assets are served from the prebuilt `dist/public` directory. If `POSTGRES_URL` is not set, the server will still boot but only serve the static frontend; API routes remain disabled.
+The included `render.yaml` provisions a free PostgreSQL database and configures the service to run `npm install && npm run build` during the build phase and `npm start` at runtime. Static assets are served from the prebuilt `dist/public` directory. If `DATABASE_URL` is not set, the server will still boot but only serve the static frontend; API routes remain disabled.
 
 
 ## API Endpoints

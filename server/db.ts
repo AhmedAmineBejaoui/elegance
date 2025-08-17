@@ -4,8 +4,8 @@ import { drizzle } from "drizzle-orm/vercel-postgres";
 import * as schema from "@shared/schema";
 import "dotenv/config";
 
-if (!process.env.POSTGRES_URL) {
-  throw new Error("POSTGRES_URL must be set");
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL must be set");
 }
 
 export const db = drizzle(sql, { schema });

@@ -14,5 +14,5 @@ services:
       - key: NODE_VERSION
         value: 22.16.0
 
-      - key: POSTGRES_URL
+      - key: DATABASE_URL
         fromDatabase: elegance-db

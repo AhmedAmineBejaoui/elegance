@@ -7,8 +7,8 @@ let isInitialized = false;
 // Initialize the app once
 const initializeApp = async () => {
   if (!isInitialized) {
-    // Only register routes if we have POSTGRES_URL
-    if (process.env.POSTGRES_URL) {
+    // Only register routes if we have DATABASE_URL
+    if (process.env.DATABASE_URL) {
       try {
         const { registerRoutes } = await import('../dist/server/routes.js');
         await registerRoutes(app);
@@ -18,7 +18,7 @@ const initializeApp = async () => {
         // Don't throw, just log - let the app start without routes
       }
     } else {
-      console.warn('POSTGRES_URL not set, skipping route registration');
+      console.warn('DATABASE_URL not set, skipping route registration');
     }
     isInitialized = true;
   }
