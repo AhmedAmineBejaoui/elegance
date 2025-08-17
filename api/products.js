@@ -38,15 +38,27 @@ export default async function handler(req, res) {
 
       // Vérifier que la base de données est accessible
       try {
-        const products = await db.sql`
-          SELECT p.*, c.name as category_name
-          FROM products p
-          LEFT JOIN categories c ON p.category_id = c.id
-          WHERE p.is_active = true
-          ${isFeatured === 'true' ? db.sql`AND p.is_featured = true` : db.sql``}
-          ORDER BY p.created_at DESC
-          LIMIT ${limitValue}
-        `;
+        let products;
+        
+        if (isFeatured === 'true') {
+          products = await db.sql`
+            SELECT p.*, c.name as category_name
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE p.is_active = true AND p.is_featured = true
+            ORDER BY p.created_at DESC
+            LIMIT ${limitValue}
+          `;
+        } else {
+          products = await db.sql`
+            SELECT p.*, c.name as category_name
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE p.is_active = true
+            ORDER BY p.created_at DESC
+            LIMIT ${limitValue}
+          `;
+        }
 
         res.status(200).json({ items: products.rows });
       } catch (dbError) {

@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
     // Si pas de token, retourner null (utilisateur non connecté)
     if (!token) {
-      res.set('Cache-Control', 'no-store');
+      res.setHeader('Cache-Control', 'no-store');
       return res.json({ user: null });
     }
 
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
     try {
       const decoded = jwt.verify(token, secret);
       if (!decoded || !decoded.sub) {
-        res.set('Cache-Control', 'no-store');
+        res.setHeader('Cache-Control', 'no-store');
         return res.json({ user: null });
       }
 
@@ -61,17 +61,17 @@ export default async function handler(req, res) {
       `;
 
       if (userResult.rows.length === 0) {
-        res.set('Cache-Control', 'no-store');
+        res.setHeader('Cache-Control', 'no-store');
         return res.json({ user: null });
       }
 
       const user = userResult.rows[0];
-      res.set('Cache-Control', 'private, max-age=60');
+      res.setHeader('Cache-Control', 'private, max-age=60');
       return res.json({ user });
 
     } catch (jwtError) {
       console.warn('JWT verification failed:', jwtError.message);
-      res.set('Cache-Control', 'no-store');
+      res.setHeader('Cache-Control', 'no-store');
       return res.json({ user: null });
     }
 
