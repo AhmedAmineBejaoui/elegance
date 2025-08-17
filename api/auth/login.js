@@ -1,7 +1,13 @@
-import { sql } from '@vercel/postgres';
+import { createPool } from '@vercel/postgres';
 import bcrypt from 'bcryptjs';
 
 export const config = { runtime: 'nodejs' };
+
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error('DATABASE_URL is not set');
+}
+const db = createPool({ connectionString: DATABASE_URL });
 
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -23,12 +29,6 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Early return if database is not configured
-  if (!process.env.DATABASE_URL) {
-    res.status(503).json({ message: 'Database not configured' });
-    return;
-  }
-
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body;
     const { email, password } = body;
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Email and password required' });
     }
 
-    const { rows } = await sql`SELECT id, password_hash, first_name, last_name, email, role FROM users WHERE email = ${email} LIMIT 1`;
+    const { rows } = await db.sql`SELECT id, password_hash, first_name, last_name, email, role FROM users WHERE email = ${email} LIMIT 1`;
     const user = rows[0];
 
     if (!user) {

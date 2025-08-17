@@ -1,12 +1,14 @@
 // server/db.ts
-import { sql } from "@vercel/postgres";
+import { createPool } from "@vercel/postgres";
 import { drizzle } from "drizzle-orm/vercel-postgres";
 import * as schema from "@shared/schema";
 import "dotenv/config";
 
-if (!process.env.DATABASE_URL) {
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
   throw new Error("DATABASE_URL must be set");
 }
+const pool = createPool({ connectionString: DATABASE_URL });
 
-export const db = drizzle(sql, { schema });
+export const db = drizzle(pool, { schema });
 export default db;

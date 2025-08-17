@@ -89,7 +89,7 @@ npm install
 
 3. Set up environment variables
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the root directory (you can start from `.env.example`) with the following variables:
 
 ```env
 DATABASE_URL=postgres://username:password@localhost:5432/tunisianchic
@@ -106,6 +106,8 @@ SMTP_USER=your_smtp_user
 SMTP_PASS=your_smtp_password
 CONTACT_RECIPIENT=contact@example.com
 ```
+
+For deployments on Vercel, configure the `DATABASE_URL` environment variable in your project settings.
 
 4. Run migrations
 
