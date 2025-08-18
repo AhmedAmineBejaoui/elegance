@@ -1,7 +1,7 @@
 import "./load-env";
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
-import { log } from "./vite";
+import { log } from "./logger";
 // @ts-ignore - multer n'a pas de types dans ce projet
 import multer from "multer";
 

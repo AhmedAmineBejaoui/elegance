@@ -67,11 +67,7 @@ export async function setupAuth(app: Express): Promise<void> {
   const clientID = (GOOGLE_CLIENT_ID || "").trim();
   const clientSecret = (GOOGLE_CLIENT_SECRET || "").trim();
 
-  if (!clientID || !clientSecret) {
-    throw new Error(
-      "Google OAuth: GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET doivent être définis dans .env"
-    );
-  }
+  const hasGoogle = Boolean(clientID && clientSecret);
 
   const callbackUrlString = REDIRECT_URI;
   const callbackPath = CALLBACK_PATH;
@@ -110,31 +106,33 @@ export async function setupAuth(app: Express): Promise<void> {
   app.use(verifyJWT);
 
   // ---- Strategies ----
-  passport.use(
-    new GoogleStrategy(
-      {
-        clientID,
-        clientSecret,
-        callbackURL: callbackUrlString,
-      },
-      async (_accessToken, _refreshToken, profile, done) => {
-        try {
-          const email = profile.emails?.[0]?.value;
-          if (!email) return done(new Error("Google account has no email"));
-          const userData = {
-            email,
-            firstName: profile.name?.givenName,
-            lastName: profile.name?.familyName,
-            profileImageUrl: profile.photos?.[0]?.value,
-          };
-          const fullUser = await storage.upsertUser(userData);
-          return done(null, fullUser);
-        } catch (err) {
-          return done(err as Error);
+  if (hasGoogle) {
+    passport.use(
+      new GoogleStrategy(
+        {
+          clientID,
+          clientSecret,
+          callbackURL: callbackUrlString,
+        },
+        async (_accessToken, _refreshToken, profile, done) => {
+          try {
+            const email = profile.emails?.[0]?.value;
+            if (!email) return done(new Error("Google account has no email"));
+            const userData = {
+              email,
+              firstName: profile.name?.givenName,
+              lastName: profile.name?.familyName,
+              profileImageUrl: profile.photos?.[0]?.value,
+            };
+            const fullUser = await storage.upsertUser(userData);
+            return done(null, fullUser);
+          } catch (err) {
+            return done(err as Error);
+          }
         }
-      }
-    )
-  );
+      )
+    );
+  }
 
   passport.use(
     new LocalStrategy({ usernameField: "email" }, async (email, password, done) => {
@@ -160,16 +158,22 @@ export async function setupAuth(app: Express): Promise<void> {
 
   // ---- Routes Auth ----
   // Lance le flow Google
-  app.get("/api/login", passport.authenticate("google", { scope: ["profile", "email"] }));
+  if (hasGoogle) {
+    app.get("/api/login", passport.authenticate("google", { scope: ["profile", "email"] }));
+  } else {
+    app.get("/api/login", (_req, res) => res.status(501).json({ message: "Google OAuth not configured" }));
+  }
 
   // Callback exact (même path que dans l'URL fournie à Google)
-  app.get(
-    callbackPath,
-    passport.authenticate("google", {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
-    })
-  );
+  if (hasGoogle) {
+    app.get(
+      callbackPath,
+      passport.authenticate("google", {
+        successReturnToOrRedirect: "/",
+        failureRedirect: "/api/login",
+      })
+    );
+  }
 
   // Local login
   app.post("/api/auth/login", (req, res, next) => {
