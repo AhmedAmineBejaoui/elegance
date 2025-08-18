@@ -281,6 +281,7 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
         isActive: req.query.isActive ? req.query.isActive === 'true' : true,
         isFeatured: req.query.isFeatured ? req.query.isFeatured === 'true' : undefined,
         limit: req.query.limit ? Number(req.query.limit as string) : undefined,
+        sort: req.query.sort as string,
       };
       const products = await storage.getProducts(filters);
       res.json(products);

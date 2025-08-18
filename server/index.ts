@@ -1,11 +1,20 @@
 import "./load-env";
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { log } from "./vite";
 // @ts-ignore - multer n'a pas de types dans ce projet
 import multer from "multer";
 
 export const app = express();
 app.set("etag", false);
+
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  })
+);
 
 // Middleware global (désactive l'avertissement sur toutes les routes)
 app.use((req, res, next) => {
