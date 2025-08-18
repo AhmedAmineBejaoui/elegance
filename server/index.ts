@@ -1,7 +1,7 @@
 import "./load-env";
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
-import { log } from "./logger";
+import { logger } from "./logger";
 // @ts-ignore - multer n'a pas de types dans ce projet
 import multer from "multer";
 
@@ -57,7 +57,7 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(logLine);
+      logger(logLine);
     }
   });
 
@@ -93,9 +93,9 @@ const hasDbUrl = Boolean(process.env.DATABASE_URL || process.env.POSTGRES_URL);
 if (hasDbUrl) {
   const { registerRoutes } = await import("./routes");
   await registerRoutes(app);
-  log("Routes registered");
+  logger("Routes registered");
 } else {
-  log("DATABASE_URL/POSTGRES_URL not set, API routes disabled", "warn");
+  logger("DATABASE_URL/POSTGRES_URL not set, API routes disabled", "warn");
 }
 
 // Gestion des erreurs globales
@@ -117,6 +117,6 @@ export default app;
 if (process.env.VERCEL !== "1") {
   const port = parseInt(process.env.PORT || "5000", 10);
   app.listen(port, "0.0.0.0", () => {
-    log(`✨ Server running on http://localhost:${port}`);
+    logger(`✨ Server running on http://localhost:${port}`);
   });
 }

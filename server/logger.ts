@@ -1,4 +1,4 @@
-export function log(message: string, source = "express"): void {
+export function logger(message: string, source = "express"): void {
 	const formattedTime = new Date().toLocaleTimeString("en-US", {
 		hour: "numeric",
 		minute: "2-digit",
