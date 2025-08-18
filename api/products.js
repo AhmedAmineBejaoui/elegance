@@ -23,11 +23,7 @@ export default async function handler(req, res) {
 
   if (!db) {
     console.error('Database not configured - DATABASE_URL missing');
-    res.status(500).json({ 
-      message: 'Database not configured', 
-      hasDatabase: false,
-      error: 'DATABASE_URL environment variable is not set'
-    });
+    res.status(200).json({ items: [] });
     return;
   }
 
@@ -63,21 +59,13 @@ export default async function handler(req, res) {
         res.status(200).json({ items: products.rows });
       } catch (dbError) {
         console.error('Database query error:', dbError);
-        res.status(500).json({
-          message: 'Database query failed',
-          error: dbError.message,
-          hasDatabase: true
-        });
+        res.status(200).json({ items: [] });
       }
     } else {
       res.status(405).json({ message: 'Method not allowed' });
     }
   } catch (error) {
     console.error('Products API error:', error);
-    res.status(500).json({
-      message: 'Internal server error',
-      error: error.message,
-      hasDatabase: !!DATABASE_URL
-    });
+    res.status(200).json({ items: [] });
   }
 }

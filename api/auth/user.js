@@ -2,6 +2,12 @@ import jwt from 'jsonwebtoken';
 import { createPool } from '@vercel/postgres';
 import cookie from 'cookie';
 
+// Initialize the database connection lazily. If the environment variable is
+// missing (e.g. in demo environments), we don't want to throw an error at
+// module import time. Instead we'll simply treat the user as unauthenticated.
+const DATABASE_URL = process.env.DATABASE_URL;
+const db = DATABASE_URL ? createPool({ connectionString: DATABASE_URL }) : null;
+
 // Middleware pour parser les cookies
 function parseCookies(req) {
   const cookieHeader = req.headers.cookie;
@@ -52,11 +58,16 @@ export default async function handler(req, res) {
         return res.json({ user: null });
       }
 
-      // Récupérer l'utilisateur depuis la base de données
-      const db = createPool({ connectionString: process.env.DATABASE_URL });
+      // Récupérer l'utilisateur depuis la base de données si disponible.
+      if (!db) {
+        // Pas de base de données configurée → considérer l'utilisateur comme non connecté.
+        res.setHeader('Cache-Control', 'no-store');
+        return res.json({ user: null });
+      }
+
       const userResult = await db.sql`
         SELECT id, email, first_name, last_name, profile_image_url, role, created_at, updated_at
-        FROM users 
+        FROM users
         WHERE id = ${decoded.sub}
       `;
 
@@ -77,6 +88,9 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('User API error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.setHeader('Cache-Control', 'no-store');
+    // En cas d'erreur, retourner simplement "user: null" afin d'éviter un 500
+    // côté client lorsque la base de données est indisponible.
+    return res.json({ user: null });
   }
 }
