@@ -1,11 +1,11 @@
 import "./load-env";
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
-import { logger } from "./logger";
+import { log } from "./logger";
 // @ts-ignore - multer n'a pas de types dans ce projet
 import multer from "multer";
 
-import { db } from "./db";
+import { getDb } from "./db";
 export const app = express();
 app.set("etag", false);
 
@@ -57,7 +57,7 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      logger(logLine);
+      log(logLine);
     }
   });
 
@@ -66,6 +66,7 @@ app.use((req, res, next) => {
 
 app.get("/api/healthz", async (_req, res) => {
   try {
+    const db = getDb();
     await db.query("SELECT 1");
     res.json({ ok: true });
   } catch (e) {
@@ -89,13 +90,13 @@ app.get("/api/debug/env", (_req, res) => {
   res.json({ present });
 });
 
-const hasDbUrl = Boolean(process.env.DATABASE_URL || process.env.POSTGRES_URL);
+const hasDbUrl = Boolean(process.env.DATABASE_URL);
 if (hasDbUrl) {
   const { registerRoutes } = await import("./routes");
   await registerRoutes(app);
-  logger("Routes registered");
+  log("Routes registered");
 } else {
-  logger("DATABASE_URL/POSTGRES_URL not set, API routes disabled", "warn");
+  log("DATABASE_URL/POSTGRES_URL not set, API routes disabled", "warn");
 }
 
 // Gestion des erreurs globales
@@ -117,6 +118,6 @@ export default app;
 if (process.env.VERCEL !== "1") {
   const port = parseInt(process.env.PORT || "5000", 10);
   app.listen(port, "0.0.0.0", () => {
-    logger(`✨ Server running on http://localhost:${port}`);
+    log(`✨ Server running on http://localhost:${port}`);
   });
 }
