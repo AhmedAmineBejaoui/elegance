@@ -24,7 +24,8 @@ import {
   type InsertReview,
   type NewsletterSubscription,
 } from "@shared/schema";
-import { drizzleDb as db } from "./db";
+import { getDrizzleDb } from "./db";
+const db = getDrizzleDb();
 import { eq, desc, asc, and, like, inArray, sql } from "drizzle-orm";
 
 export interface IStorage {
@@ -198,6 +199,7 @@ export class DatabaseStorage implements IStorage {
     isActive?: boolean;
     isFeatured?: boolean;
     limit?: number;
+    sort?: string;
   }): Promise<Product[]> {
     const conditions = [];
 
@@ -294,7 +296,7 @@ export class DatabaseStorage implements IStorage {
 
     return {
       ...order,
-      items: items.map(item => ({
+      items: items.map((item: any) => ({
         ...item.order_items,
         product: item.products!,
       })),
@@ -314,7 +316,7 @@ export class DatabaseStorage implements IStorage {
 
       ordersWithItems.push({
         ...order,
-        items: items.map(item => ({
+        items: items.map((item: any) => ({
           ...item.order_items,
           product: item.products!,
         })),
@@ -325,7 +327,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createOrder(order: InsertOrder, userEmail?: string): Promise<Order> {
-    return db.transaction(async tx => {
+    return db.transaction(async (tx: any) => {
       const [newOrder] = await tx.insert(orders).values(order).returning();
       if (userEmail && Number(order.discount) > 0) {
         await tx
@@ -359,7 +361,7 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(products, eq(cartItems.productId, products.id))
       .where(eq(cartItems.userId, userId));
 
-    return items.map(item => ({
+    return items.map((item: any) => ({
       ...item.cart_items,
       product: item.products!,
     }));
@@ -420,7 +422,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(reviews.productId, productId))
       .orderBy(desc(reviews.createdAt));
 
-    return reviewsData.map(review => ({
+    return reviewsData.map((review: any) => ({
       ...review.reviews,
       user: review.users!,
     }));
@@ -498,27 +500,27 @@ export class DatabaseStorage implements IStorage {
     const allOrders = await db.select().from(orders);
 
     const totalOrders = allOrders.length;
-    const totalRevenue = allOrders.reduce((sum, o) => sum + Number(o.total), 0);
-    const pendingOrders = allOrders.filter(o => o.status === "pending").length;
-    const completedOrders = allOrders.filter(o => o.status === "delivered").length;
+    const totalRevenue = allOrders.reduce((sum: number, o: any) => sum + Number(o.total), 0);
+    const pendingOrders = allOrders.filter((o: any) => o.status === "pending").length;
+    const completedOrders = allOrders.filter((o: any) => o.status === "delivered").length;
 
     const currentYear = new Date().getFullYear();
     const lastYear = currentYear - 1;
     const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
-    const salesByMonth = monthNames.map((name, idx) => {
+    const salesByMonth = monthNames.map((name: string, idx: number) => {
       const thisYearTotal = allOrders
-        .filter(o => {
+        .filter((o: any) => {
           const d = new Date(o.createdAt!);
           return d.getFullYear() === currentYear && d.getMonth() === idx;
         })
-        .reduce((acc, o) => acc + Number(o.total), 0);
+        .reduce((acc: number, o: any) => acc + Number(o.total), 0);
       const lastYearTotal = allOrders
-        .filter(o => {
+        .filter((o: any) => {
           const d = new Date(o.createdAt!);
           return d.getFullYear() === lastYear && d.getMonth() === idx;
         })
-        .reduce((acc, o) => acc + Number(o.total), 0);
+        .reduce((acc: number, o: any) => acc + Number(o.total), 0);
       return { month: name, thisYear: thisYearTotal, lastYear: lastYearTotal };
     });
 
@@ -527,7 +529,7 @@ export class DatabaseStorage implements IStorage {
       const channel = o.paymentMethod || "Autre";
       channelMap[channel] = (channelMap[channel] || 0) + 1;
     }
-    const ordersByChannel = Object.entries(channelMap).map(([channel, value]) => ({ channel, value }));
+    const ordersByChannel = Object.entries(channelMap).map(([channel, value]: [string, number]) => ({ channel, value }));
 
     return {
       totalOrders,

@@ -2,11 +2,22 @@ import { createPool } from "@vercel/postgres";
 import { drizzle } from "drizzle-orm/vercel-postgres";
 import * as schema from "@shared/schema";
 
-export const config = { runtime: "nodejs" };
+let pool: ReturnType<typeof createPool> | null = null;
+let drizzleDb: any = null;
 
-const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
-if (!url) throw new Error("DATABASE_URL/POSTGRES_URL is not set");
+export function getDb() {
+  if (!pool) {
+    const url = process.env.DATABASE_URL;
+    if (!url) throw new Error("DATABASE_URL not set");
+    pool = createPool({ connectionString: url });
+    drizzleDb = drizzle(pool, { schema });
+  }
+  return pool;
+}
 
-export const db = createPool({ connectionString: url });
-export const drizzleDb = drizzle(db, { schema });
-export default drizzleDb;
+export function getDrizzleDb() {
+  if (!drizzleDb) {
+    getDb();
+  }
+  return drizzleDb;
+}

@@ -1,8 +1,9 @@
-import { db } from "./db";
+import { getDrizzleDb } from "./db";
 import { products, categories } from "../shared/schema"; // ← Bien vérifier le chemin
 
 async function seed() {
   try {
+    const db = getDrizzleDb();
     // Supprimer les anciens enregistrements (produits avant catégories à cause des contraintes FK)
     await db.delete(products);
     await db.delete(categories);
