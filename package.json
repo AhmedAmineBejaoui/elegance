@@ -8,9 +8,10 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && npm run build:client && npm run build:server",
-    "build:client": "vite build",
     "build:server": "tsc -p tsconfig.server.json",
+    "build:client": "vite build",
+    "build": "npm run clean && npm run build:server && npm run build:client",
+    "postbuild": "node -e \"require('fs').accessSync('dist/server/index.js')\"",
     "dev": "vite",
     "start": "cross-env NODE_ENV=production node dist/server/index.js",
     "vercel-build": "npm run build",

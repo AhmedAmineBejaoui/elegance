@@ -1,15 +1,16 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "module": "ESNext",
     "outDir": "dist/server",
+    "rootDir": "server",
+    "isolatedModules": false,
     "noEmit": false,
     "types": ["node"],
     "baseUrl": "./",
     "paths": {
-      "@shared/*": ["shared/*"]
+      "@shared/*": ["server/shared/*"]
     }
   },
-  "include": ["server/**/*"],
+  "include": ["server/**/*.ts"],
   "exclude": ["client", "dist", "node_modules", "server/tests", "**/*.test.ts"]
 }

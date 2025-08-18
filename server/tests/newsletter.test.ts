@@ -1,5 +1,5 @@
-import { storage } from "../storage";
-import { db } from "../db";
+import { storage } from "../storage.js";
+import { db } from "../db.js";
 
 async function run() {
   const email = `test${Date.now()}@example.com`;

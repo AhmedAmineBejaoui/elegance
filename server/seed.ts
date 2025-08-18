@@ -1,5 +1,5 @@
-import { getDrizzleDb } from "./db";
-import { products, categories } from "../shared/schema"; // ← Bien vérifier le chemin
+import { getDrizzleDb } from "./db.js";
+import { products, categories } from "./shared/schema.js"; // ← Bien vérifier le chemin
 
 async function seed() {
   try {
