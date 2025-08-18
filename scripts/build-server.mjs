@@ -14,6 +14,9 @@ await build({
   minify: true,
   sourcemap: false,
   external: [],
+  banner: {
+    js: `import { createRequire } from "node:module"; const require = createRequire(import.meta.url);`
+  }
 });
 
 const sanitized = readFileSync(outfile, "utf8")

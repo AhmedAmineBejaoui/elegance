@@ -2,6 +2,11 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist/public",
+  "functions": {
+    "api/[...all].js": {
+      "runtime": "@vercel/node@20.x"
+    }
+  },
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/[...all]" },
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
