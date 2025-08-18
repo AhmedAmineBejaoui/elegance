@@ -42,7 +42,7 @@ export default function NousRejoindre() {
                 Accueillir et accompagner nos clientes en boutique.
               </p>
               <Button asChild>
-                <a href="mailto:jobs@elegance.tn?subject=Conseiller%20de%20vente">
+                <a href="mailto:casadelmarguesthouse@gmail.com">
                   Postuler
                 </a>
               </Button>
@@ -58,7 +58,7 @@ export default function NousRejoindre() {
                 Participer à la création de nos prochaines collections.
               </p>
               <Button asChild>
-                <a href="mailto:jobs@elegance.tn?subject=Styliste">Postuler</a>
+                <a href="mailto:casadelmarguesthouse@gmail.com?subject=Styliste">Postuler</a>
               </Button>
             </CardContent>
           </Card>
@@ -69,7 +69,7 @@ export default function NousRejoindre() {
           <p className="text-gray-600 mb-4">
 
             Aucune offre ne correspond à votre profil ? Envoyez-nous votre CV à
-            jobs@elegance.tn.
+            casadelmarguesthouse@gmail.com.
           </p>
         </section>
 

@@ -85,7 +85,7 @@ export default function Home() {
               >
                 <div className="relative overflow-hidden">
                   <img
-                    src={category.imageUrl || "/placeholder-category.jpg"}
+                    src={category.imageUrl || "https://plus.unsplash.com/premium_photo-1690349404248-3ddd9be40eb1?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
                     alt={category.name}
                     className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
