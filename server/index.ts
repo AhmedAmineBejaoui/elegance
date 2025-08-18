@@ -70,6 +70,7 @@ app.get("/api/healthz", async (_req, res) => {
     res.json({ ok: true });
   } catch (e) {
     console.error("healthz", e);
+
     res.status(500).json({ ok: false, reason: 'db' });
   }
 });
@@ -78,6 +79,7 @@ app.get('/api/debug/env', (_req, res) => {
   const must = ['DATABASE_URL','JWT_SECRET','SESSION_SECRET','COOKIE_SECRET','APP_URL','NEXTAUTH_URL'];
   const present = Object.fromEntries(must.map(k => [k, Boolean(process.env[k])]));
   res.json({ present });
+
 });
 
 if (process.env.DATABASE_URL) {
@@ -93,9 +95,11 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   if (err.code === 'LIMIT_FILE_SIZE') {
     return res.status(413).json({ message: 'Fichier trop volumineux (max 10MB)' });
   }
+
   console.error('[API ERROR]', err?.message || err, err?.stack);
   const status = err?.statusCode || err?.status || 500;
   res.status(status).json({ message: 'Internal error', code: 'E_INTERNAL' });
+
 });
 
 
