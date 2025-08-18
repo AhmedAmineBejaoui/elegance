@@ -1,10 +1,11 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { API_BASE } from "./api";
 
-async function throwIfResNotOk(res: Response) {
+async function handleApiError(res: Response, url: string) {
   if (!res.ok) {
-    const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
+    console.warn('API error', res.status, url);
+    const text = await res.text().catch(() => '');
+    throw new Error(`API ${res.status} on ${url}: ${text || res.statusText}`);
   }
 }
 
@@ -21,7 +22,7 @@ export async function apiRequest(
     credentials: "include",
   });
 
-  await throwIfResNotOk(res);
+  await handleApiError(res, url);
   return res;
 }
 
@@ -31,7 +32,8 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(`${API_BASE}${queryKey.join("/") as string}`, {
+    const url = `${queryKey.join("/") as string}`;
+    const res = await fetch(`${API_BASE}${url}`, {
       credentials: "include",
     });
 
@@ -39,7 +41,7 @@ export const getQueryFn: <T>(options: {
       return null;
     }
 
-    await throwIfResNotOk(res);
+    await handleApiError(res, url);
     return await res.json();
   };
 
