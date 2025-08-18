@@ -2,13 +2,8 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist/public",
-  "functions": {
-    "api/[...all].js": {
-      "runtime": "nodejs@20"
-    }
-  },
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/[...all]" },
+    { "src": "/api/(.*)", "dest": "/api/[...all].js" },
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ],
