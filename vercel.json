@@ -4,7 +4,7 @@
   "outputDirectory": "dist/public",
   "functions": {
     "api/[...all].js": {
-      "runtime": "nodejs22"
+      "runtime": "nodejs22.17.0"
     }
   },
   "routes": [
