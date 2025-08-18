@@ -24,7 +24,7 @@ import {
   type InsertReview,
   type NewsletterSubscription,
 } from "@shared/schema";
-import { db } from "./db";
+import { drizzleDb as db } from "./db";
 import { eq, desc, asc, and, like, inArray, sql } from "drizzle-orm";
 
 export interface IStorage {

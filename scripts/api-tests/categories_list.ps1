@@ -1,14 +1,4 @@
-$BASE_URL = "https://elegance-ten.vercel.app"
-$COOKIE   = ""
-
-$headers = @{ "Content-Type"="application/json" }
-if ($COOKIE) { $headers["Cookie"] = $COOKIE }
-
-try {
-  $r = Invoke-WebRequest -Uri "$BASE_URL/api/categories" -Headers $headers -Method GET -ErrorAction Stop
-  Write-Output $r.Content
-} catch {
-  $res = $_.Exception.Response
-  Write-Host "HTTP $($res.StatusCode.value__)"
-  (New-Object IO.StreamReader($res.GetResponseStream())).ReadToEnd()
-}
+$BASE_URL="https://elegance-dusky.vercel.app"; $COOKIE=""
+$h=@{"Content-Type"="application/json"}; if($COOKIE){$h["Cookie"]=$COOKIE}
+try{$r=Invoke-WebRequest "$BASE_URL/api/categories" -Headers $h -Method GET -ErrorAction Stop; $r.Content}
+catch{$res=$_.Exception.Response;"HTTP $($res.StatusCode.value__)";(New-Object IO.StreamReader($res.GetResponseStream())).ReadToEnd()}
