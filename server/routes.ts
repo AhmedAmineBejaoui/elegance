@@ -32,6 +32,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+    // 60s de cache navigateur (privé)
     res.set("Cache-Control", "private, max-age=60");
     return res.json({ user });
   });
@@ -233,8 +234,8 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
       const categories = await storage.getCategories();
       res.json(categories);
     } catch (error) {
-      console.error("Error fetching categories:", error);
-      res.status(500).json({ message: "Failed to fetch categories" });
+      console.error('[public-endpoint]', error);
+      return res.status(503).json({ data: [], error: 'service_unavailable' });
     }
   });
 
@@ -288,8 +289,8 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
       const products = await storage.getProducts(filters);
       res.json(products);
     } catch (error) {
-      console.error("Error fetching products:", error);
-      res.status(500).json({ message: "Failed to fetch products" });
+      console.error('[public-endpoint]', error);
+      return res.status(503).json({ data: [], error: 'service_unavailable' });
     }
   });
 

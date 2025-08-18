@@ -10,6 +10,16 @@ export async function api(path: string, init?: RequestInit) {
   return ct.includes("application/json") ? res.json() : res.text();
 }
 
+export async function apiGet(url: string) {
+  const r = await fetch(`${API_BASE}${url}`, { credentials: 'include' });
+  if (!r.ok) {
+    console.warn('API error', r.status, url);
+    const text = await r.text().catch(() => '');
+    throw new Error(`API ${r.status} on ${url}: ${text || r.statusText}`);
+  }
+  return r.json();
+}
+
 // utilitaires anti-crash
 export const asArray = <T,>(x: unknown): T[] => Array.isArray(x) ? (x as T[]) : [];
 
