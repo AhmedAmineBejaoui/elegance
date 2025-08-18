@@ -8,7 +8,7 @@ export function HeroBanner() {
       className="relative h-[80vh] w-full bg-cover bg-center flex items-center justify-center"
       style={{
         backgroundImage:
-          "url('https://cdn.shopify.com/s/files/1/0811/9576/1939/files/L1280520_1_2_163d4731-015c-483d-a689-a82cdb5ffbb2.png')",
+          "url('https://images.unsplash.com/photo-1545911927-7c17fa4d3727?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
       }}
     >
       <div className="bg-black/50 text-white p-8 text-center rounded max-w-xl">
