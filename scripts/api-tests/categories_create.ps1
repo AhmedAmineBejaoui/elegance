@@ -1,17 +1,6 @@
 param([string]$Name)
-
-$BASE_URL = "https://elegance-ten.vercel.app"
-$COOKIE   = ""
-
-$headers = @{ "Content-Type"="application/json" }
-if ($COOKIE) { $headers["Cookie"] = $COOKIE }
-
-$body = @{ name=$Name } | ConvertTo-Json
-try {
-  $r = Invoke-WebRequest -Uri "$BASE_URL/api/categories" -Headers $headers -Method POST -Body $body -ErrorAction Stop
-  Write-Output $r.Content
-} catch {
-  $res = $_.Exception.Response
-  Write-Host "HTTP $($res.StatusCode.value__)"
-  (New-Object IO.StreamReader($res.GetResponseStream())).ReadToEnd()
-}
+$BASE_URL="https://elegance-dusky.vercel.app"; $COOKIE=""
+$h=@{"Content-Type"="application/json"}; if($COOKIE){$h["Cookie"]=$COOKIE}
+$body=@{name=$Name}|ConvertTo-Json
+try{$r=Invoke-WebRequest "$BASE_URL/api/categories" -Headers $h -Method POST -Body $body -ErrorAction Stop; $r.Content}
+catch{$res=$_.Exception.Response;"HTTP $($res.StatusCode.value__)";(New-Object IO.StreamReader($res.GetResponseStream())).ReadToEnd()}
