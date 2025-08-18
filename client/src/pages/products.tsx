@@ -32,7 +32,7 @@ export default function Products() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchTerm, setSearchTerm] = useState(filters.search || "");
 
-  const { data: productsData = [], isLoading } = useQuery<Product[]>({
+  const { data: productsData = [], isLoading, isError } = useQuery<Product[]>({
     queryKey: [`/api/products?${new URLSearchParams(
       Object.fromEntries(
         Object.entries(filters).filter(([, value]) => value !== undefined && value !== "")
@@ -181,6 +181,10 @@ export default function Products() {
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              </div>
+            ) : isError ? (
+              <div className="text-center py-16">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Service indisponible, réessayez plus tard</h3>
               </div>
             ) : sortedProducts.length === 0 ? (
               <div className="text-center py-16" data-testid="no-products">

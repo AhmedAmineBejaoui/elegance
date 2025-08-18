@@ -1,11 +1,22 @@
 import "./load-env";
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
-import { log } from "./vite";
 // @ts-ignore - multer n'a pas de types dans ce projet
 import multer from "multer";
 
 import { db } from "./db";
+
+function log(message: string, source = "express") {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
+
 export const app = express();
 app.set("etag", false);
 
@@ -70,8 +81,16 @@ app.get("/api/healthz", async (_req, res) => {
     res.json({ ok: true });
   } catch (e) {
     console.error("healthz", e);
-    res.status(500).json({ ok: false });
+
+    res.status(500).json({ ok: false, reason: 'db' });
   }
+});
+
+app.get('/api/debug/env', (_req, res) => {
+  const must = ['DATABASE_URL','JWT_SECRET','SESSION_SECRET','COOKIE_SECRET','APP_URL','NEXTAUTH_URL'];
+  const present = Object.fromEntries(must.map(k => [k, Boolean(process.env[k])]));
+  res.json({ present });
+
 });
 
 if (process.env.DATABASE_URL) {
@@ -84,11 +103,14 @@ if (process.env.DATABASE_URL) {
 
 // Gestion des erreurs globales
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  if (err.code === "LIMIT_FILE_SIZE") {
-    return res.status(413).json({ message: "Fichier trop volumineux (max 10MB)" });
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ message: 'Fichier trop volumineux (max 10MB)' });
   }
-  console.error(err);
-  res.status(500).json({ message: "Internal error", code: "E_INTERNAL" });
+
+  console.error('[API ERROR]', err?.message || err, err?.stack);
+  const status = err?.statusCode || err?.status || 500;
+  res.status(status).json({ message: 'Internal error', code: 'E_INTERNAL' });
+
 });
 
 
