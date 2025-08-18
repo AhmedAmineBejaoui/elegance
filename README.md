@@ -171,7 +171,7 @@ The included `render.yaml` provisions a free PostgreSQL database and configures 
 
 ## Database Schema
 
-The database schema is defined in the `shared/schema.ts` file using Drizzle ORM. It includes tables for:
+The database schema is defined in the `server/shared/schema.ts` file using Drizzle ORM. It includes tables for:
 
 - Users
 - Products

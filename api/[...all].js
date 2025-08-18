@@ -1,3 +1,3 @@
-import app from '../dist/server/index.js';
 export const config = { runtime: 'nodejs' };
+import app from '../dist/server/index.js';
 export default app;

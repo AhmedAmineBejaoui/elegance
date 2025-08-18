@@ -6,7 +6,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 export default {
-  schema: './shared/schema.ts',   // <-- chemin VERS ton @shared/schema
+  schema: './server/shared/schema.ts',   // <-- chemin VERS ton @shared/schema
   out: './drizzle',               // dossier où écrire les migrations
   dialect: 'postgresql',          // (nouveau drizzle-kit) ou driver: 'pg' pour anciennes versions
   dbCredentials: {

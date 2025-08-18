@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   users,
   categories,
@@ -23,8 +24,8 @@ import {
   type Review,
   type InsertReview,
   type NewsletterSubscription,
-} from "@shared/schema";
-import { getDrizzleDb } from "./db";
+} from "./shared/schema.js";
+import { getDrizzleDb } from "./db.js";
 const db = getDrizzleDb();
 import { eq, desc, asc, and, like, inArray, sql } from "drizzle-orm";
 

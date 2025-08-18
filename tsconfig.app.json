@@ -1,13 +1,15 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "outDir": "dist/public",
+    "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "./",
     "paths": {
       "@/*": ["client/src/*"],
-      "@shared/*": ["shared/*"]
+      "@shared/*": ["server/shared/*"]
     }
   },
-  "include": ["client/**/*"],
+  "include": ["client/**/*", "vite.config.*"],
   "exclude": ["server", "dist", "node_modules"]
 }

@@ -8,7 +8,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 
 // URL de callback utilisée pour Google OAuth (prod)
 const PUBLIC_BASE_URL = "https://elegance-dusky.vercel.app"; // prod

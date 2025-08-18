@@ -1,11 +1,11 @@
-import "./load-env";
+import "./load-env.js";
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
-import { log } from "./logger";
+import { log } from "./logger.js";
 // @ts-ignore - multer n'a pas de types dans ce projet
 import multer from "multer";
 
-import { getDb } from "./db";
+import { getDb } from "./db.js";
 export const app = express();
 app.set("etag", false);
 
@@ -92,7 +92,7 @@ app.get("/api/debug/env", (_req, res) => {
 
 const hasDbUrl = Boolean(process.env.DATABASE_URL);
 if (hasDbUrl) {
-  const { registerRoutes } = await import("./routes");
+  const { registerRoutes } = await import("./routes.js");
   await registerRoutes(app);
   log("Routes registered");
 } else {

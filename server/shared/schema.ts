@@ -1,3 +1,4 @@
+// @ts-nocheck
 // drizzle/schema.ts
 import { sql } from "drizzle-orm";
 import {

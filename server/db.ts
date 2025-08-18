@@ -1,6 +1,6 @@
 import { createPool } from "@vercel/postgres";
 import { drizzle } from "drizzle-orm/vercel-postgres";
-import * as schema from "@shared/schema";
+import * as schema from "./shared/schema.js";
 
 let pool: ReturnType<typeof createPool> | null = null;
 let drizzleDb: any = null;

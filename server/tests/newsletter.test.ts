@@ -1,5 +1,5 @@
-import { storage } from "../storage";
-import { db } from "../db";
+import { storage } from "../storage.js";
+import { getDb } from "../db.js";
 
 async function run() {
   const email = `test${Date.now()}@example.com`;
@@ -34,10 +34,12 @@ async function run() {
     email,
   );
   console.log("second order", secondOrder.id);
+  const db = getDb();
   await db.end?.();
 }
 
 run().catch(err => {
   console.error("test run failed", err);
+  const db = getDb();
   db.end?.();
 });
