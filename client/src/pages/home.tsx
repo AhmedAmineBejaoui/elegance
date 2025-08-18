@@ -27,7 +27,7 @@ export default function Home() {
       <Header />
 
       {/* Hero Banner */}
-      <section className="relative h-screen hero-gradient" data-testid="hero-section">
+      <section className="relative min-h-[60vh] md:min-h-[70vh] lg:min-h-screen hero-gradient" data-testid="hero-section">
         <div className="absolute inset-0 bg-black/30"></div>
         <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
           <div className="max-w-2xl text-white animate-fade-in">
@@ -88,6 +88,9 @@ export default function Home() {
                     src={category.imageUrl || "/placeholder-category.jpg"}
                     alt={category.name}
                     className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    width={1024}
+                    height={640}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-6 text-white">

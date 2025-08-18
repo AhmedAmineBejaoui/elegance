@@ -92,6 +92,9 @@ export function ProductCard({ product }: ProductCardProps) {
             src={product.images?.[0] || "/placeholder-product.jpg"}
             alt={product.name}
             className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            width={640}
+            height={640}
             data-testid={`product-image-${product.id}`}
           />
         </Link>

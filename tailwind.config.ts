@@ -4,7 +4,11 @@ export default {
   darkMode: ["class"],
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
+    container: { center: true, padding: "1rem" },
+    screens: { sm: "480px", md: "768px", lg: "1024px", xl: "1280px", "2xl": "1536px" },
     extend: {
+      spacing: { 18: "4.5rem" },
+      maxWidth: { screen: "100vw" },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -86,5 +90,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography"), require("@tailwindcss/line-clamp")],
 } satisfies Config;
