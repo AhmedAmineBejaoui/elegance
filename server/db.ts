@@ -4,11 +4,11 @@ import { drizzle } from "drizzle-orm/vercel-postgres";
 import * as schema from "@shared/schema";
 import "dotenv/config";
 
-const DATABASE_URL = process.env.DATABASE_URL;
-if (!DATABASE_URL) {
-  throw new Error("DATABASE_URL must be set");
+const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+if (!connectionString) {
+  throw new Error("DATABASE_URL/POSTGRES_URL is missing");
 }
-const pool = createPool({ connectionString: DATABASE_URL });
+export const pool = createPool({ connectionString });
 
 export const db = drizzle(pool, { schema });
 export default db;

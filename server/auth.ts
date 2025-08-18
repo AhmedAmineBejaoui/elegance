@@ -50,10 +50,19 @@ export async function setupAuth(app: Express): Promise<void> {
   const {
     SESSION_SECRET,
     DATABASE_URL,
+    POSTGRES_URL,
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
     NODE_ENV,
   } = process.env;
+
+  const connectionString = DATABASE_URL || POSTGRES_URL;
+  if (!connectionString) {
+    throw new Error('DATABASE_URL/POSTGRES_URL is missing');
+  }
+  if (!SESSION_SECRET) {
+    throw new Error('SESSION_SECRET is missing');
+  }
 
   const clientID = (GOOGLE_CLIENT_ID || "").trim();
   const clientSecret = (GOOGLE_CLIENT_SECRET || "").trim();
@@ -73,7 +82,7 @@ export async function setupAuth(app: Express): Promise<void> {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 7 jours
   const PgStore = connectPg(session);
   const sessionStore = new PgStore({
-    pool: createPool({ connectionString: DATABASE_URL }),
+    pool: createPool({ connectionString }),
     createTableIfMissing: false, // mets true si la table "sessions" n'existe pas
     ttl: sessionTtl / 1000, // connect-pg-simple attend des secondes si set via "ttl"
     tableName: "sessions",
@@ -81,7 +90,7 @@ export async function setupAuth(app: Express): Promise<void> {
 
   app.use(
     session({
-      secret: SESSION_SECRET || "dev-secret-change-me",
+      secret: SESSION_SECRET,
       store: sessionStore,
       resave: false,
       saveUninitialized: false,
