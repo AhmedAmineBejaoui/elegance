@@ -117,8 +117,8 @@ export default function ContactPage() {
 
         <p className="text-gray-600 text-center">
           Vous pouvez également nous écrire à
-          <a href="mailto:support@elegance.tn" className="text-primary underline mx-1 inline-flex items-center gap-1">
-            <Mail className="h-4 w-4" /> support@elegance.tn
+          <a href="mailto:casadelmarguesthouse@gmail.com" className="text-primary underline mx-1 inline-flex items-center gap-1">
+            <Mail className="h-4 w-4" /> casadelmarguesthouse@gmail.com
           </a>
         </p>
       </main>
