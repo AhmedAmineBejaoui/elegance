@@ -70,16 +70,32 @@ app.get("/api/healthz", async (_req, res) => {
     res.json({ ok: true });
   } catch (e) {
     console.error("healthz", e);
-    res.status(500).json({ ok: false });
+    res.status(500).json({ ok: false, reason: "db" });
   }
 });
 
-if (process.env.DATABASE_URL) {
+// Debug presence of critical env vars (no values leaked)
+app.get("/api/debug/env", (_req, res) => {
+  const must = [
+    "DATABASE_URL",
+    "POSTGRES_URL",
+    "JWT_SECRET",
+    "SESSION_SECRET",
+    "COOKIE_SECRET",
+    "APP_URL",
+    "NEXTAUTH_URL",
+  ];
+  const present = Object.fromEntries(must.map((k) => [k, Boolean(process.env[k])]));
+  res.json({ present });
+});
+
+const hasDbUrl = Boolean(process.env.DATABASE_URL || process.env.POSTGRES_URL);
+if (hasDbUrl) {
   const { registerRoutes } = await import("./routes");
   await registerRoutes(app);
   log("Routes registered");
 } else {
-  log("DATABASE_URL not set, API routes disabled", "warn");
+  log("DATABASE_URL/POSTGRES_URL not set, API routes disabled", "warn");
 }
 
 // Gestion des erreurs globales

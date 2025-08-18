@@ -29,9 +29,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ------ Auth routes
   app.get("/api/auth/user", (req, res) => {
     const user = (req.user as any) ?? null;
-    // 60s de cache navigateur (privé)
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     res.set("Cache-Control", "private, max-age=60");
-    res.json({ user });
+    return res.json({ user });
   });
 
   // ------ Payments
