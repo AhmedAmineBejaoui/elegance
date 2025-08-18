@@ -4,7 +4,7 @@
   "outputDirectory": "dist/public",
   "functions": {
     "api/[...all].js": {
-      "runtime": "@vercel/node@20.x"
+      "runtime": "nodejs20.x"
     }
   },
   "routes": [
