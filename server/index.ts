@@ -5,6 +5,7 @@ import { log } from "./vite";
 // @ts-ignore - multer n'a pas de types dans ce projet
 import multer from "multer";
 
+import { db } from "./db";
 export const app = express();
 app.set("etag", false);
 
@@ -63,20 +64,22 @@ app.use((req, res, next) => {
   next();
 });
 
-// Simple health check for uptime monitoring
-app.get("/api/health", (_req: Request, res: Response) => {
-  res.json({ ok: true });
+app.get("/api/healthz", async (_req, res) => {
+  try {
+    await db.query("SELECT 1");
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("healthz", e);
+    res.status(500).json({ ok: false });
+  }
 });
 
-// Routes will be registered in serverless handler or local dev
-if (process.env.NODE_ENV === "development" && process.env.DATABASE_URL) {
+if (process.env.DATABASE_URL) {
   const { registerRoutes } = await import("./routes");
   await registerRoutes(app);
-  log("Routes registered for development");
-} else if (!process.env.DATABASE_URL) {
-  log("DATABASE_URL not set, API routes disabled", "warn");
+  log("Routes registered");
 } else {
-  log("Production mode - routes will be registered by serverless handler");
+  log("DATABASE_URL not set, API routes disabled", "warn");
 }
 
 // Gestion des erreurs globales
@@ -84,12 +87,10 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   if (err.code === "LIMIT_FILE_SIZE") {
     return res.status(413).json({ message: "Fichier trop volumineux (max 10MB)" });
   }
-
-  const status = err.status || err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
-  res.status(status).json({ message });
-  throw err;
+  console.error(err);
+  res.status(500).json({ message: "Internal error", code: "E_INTERNAL" });
 });
+
 
 export default app;
 

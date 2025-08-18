@@ -1,38 +1,6 @@
 # Tests API
 
-Ce dossier contient des scripts PowerShell pour tester les routes CRUD de l'API.
-
-## Configuration
-
-- Modifier l'URL de base dans chaque script si besoin :
-  ```powershell
-  $BASE_URL = "https://elegance-ten.vercel.app"
-  ```
-- Pour les routes nécessitant une session, coller vos cookies dans la variable `$COOKIE` :
-  ```powershell
-  $COOKIE = "sid=...; other=..."
-  ```
-
-## Exécution
-
-Depuis PowerShell :
-
-```powershell
-cd scripts\api-tests
-# exemple
-.\products_list.ps1
-```
-
-Pour lancer les tests de base :
-
-```powershell
-.\run_all.ps1
-```
-
-## Codes HTTP courants
-
-- **401** : non connecté → ajouter `$COOKIE`.
-- **404/405** : problème de routing Vercel → vérifier catch-all `/api/[...all]` et `vercel.json`.
-- **500** : erreur serveur (DB/validation) → vérifier `DATABASE_URL` (host `-pooler` + `?sslmode=require`) et les logs Vercel.
-
-> Si `categories_delete.ps1 -Id 1` échoue, utiliser un identifiant de catégorie existant.
+- Modifier `BASE_URL` si besoin. Pour routes protégées, coller les cookies dans `$COOKIE`.
+- Exemples : `.\products_list.ps1`, `.\products_create.ps1 -Name "X" -Price 10 -CategoryId 1`, `.\profile_update.ps1 -FirstName "Ahmed"`.
+- Interprétation : **401** (non connecté), **404/405** (routing Vercel à corriger), **500** (serveur/DB → revoir `DATABASE_URL` + logs).
+- `GET $BASE_URL/api/healthz` doit renvoyer `{ ok: true }`.

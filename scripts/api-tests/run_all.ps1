@@ -1,8 +1,5 @@
-Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
-
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-cd $here
+Set-StrictMode -Version Latest; $ErrorActionPreference="Stop"
+$here=Split-Path -Parent $MyInvocation.MyCommand.Path; cd $here
 
 Write-Host "=== Products: list ===" -ForegroundColor Cyan
 .\products_list.ps1
