@@ -4,11 +4,14 @@ import { Link } from "wouter";
 
 export function HeroBanner() {
   return (
-    <div className="relative h-[80vh] w-full bg-cover bg-center bg-[url('/images/hero-banner.jpg')] flex items-center justify-center">
+    <div className="relative h-[80vh] w-full bg-cover bg-center bg-[url('https://cdn.shopify.com/s/files/1/0811/9576/1939/files/L1280520_1_2_163d4731-015c-483d-a689-a82cdb5ffbb2.png?v=1752209022')] flex items-center justify-center">
       <div className="bg-black/50 text-white p-8 text-center rounded max-w-xl">
-        <h1 className="text-4xl md:text-5xl font-light mb-4">Nouvelle Collection 2025</h1>
+        <h1 className="text-4xl md:text-5xl font-light mb-4">
+          Nouvelle Collection 2025
+        </h1>
         <p className="mb-6 text-lg">
-          Découvrez les dernières tendances mode féminine avec des pièces exclusives pour la femme tunisienne moderne.
+          Découvrez les dernières tendances mode féminine avec des pièces
+          exclusives pour la femme tunisienne moderne.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/products">
