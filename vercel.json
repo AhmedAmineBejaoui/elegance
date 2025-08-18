@@ -6,5 +6,8 @@
     { "src": "/api/(.*)", "dest": "/api/[...all]" },
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
-  ]
+  ],
+  "env": {
+    "ROLLUP_SKIP_NODEJS_NATIVE": "1"
+  }
 }

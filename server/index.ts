@@ -1,11 +1,22 @@
 import "./load-env";
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
-import { log } from "./vite";
 // @ts-ignore - multer n'a pas de types dans ce projet
 import multer from "multer";
 
 import { db } from "./db";
+
+function log(message: string, source = "express") {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
+
 export const app = express();
 app.set("etag", false);
 
