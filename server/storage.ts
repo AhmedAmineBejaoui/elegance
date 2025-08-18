@@ -25,7 +25,7 @@ import {
   type NewsletterSubscription,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, like, inArray, sql } from "drizzle-orm";
+import { eq, desc, asc, and, like, inArray, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -51,6 +51,7 @@ export interface IStorage {
     isActive?: boolean;
     isFeatured?: boolean;
     limit?: number;
+    sort?: string;
   }): Promise<Product[]>;
   getProductById(id: number): Promise<Product | undefined>;
   getProductBySlug(slug: string): Promise<Product | undefined>;
@@ -220,12 +221,17 @@ export class DatabaseStorage implements IStorage {
     if (filters?.isFeatured !== undefined) {
       conditions.push(eq(products.isFeatured, filters.isFeatured));
     }
-
     const baseQuery = conditions.length > 0
       ? db.select().from(products).where(and(...conditions))
       : db.select().from(products);
 
-    const orderedQuery = baseQuery.orderBy(desc(products.createdAt));
+    const orderMap: Record<string, any> = {
+      'newest': desc(products.createdAt),
+      'price-asc': asc(products.price),
+      'price-desc': desc(products.price),
+    };
+    const orderExpr = orderMap[filters?.sort ?? 'newest'];
+    const orderedQuery = baseQuery.orderBy(orderExpr);
 
     const limitedQuery = filters?.limit
       ? orderedQuery.limit(filters.limit)
