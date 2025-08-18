@@ -1,4 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 let cachedApp: any;
 async function loadApp() {
@@ -6,7 +8,10 @@ async function loadApp() {
   const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
   if (!url) throw new Error('DATABASE_URL/POSTGRES_URL is missing');
 
-  const mod = await import('../dist/server/index.js');
+  const serverPath = pathToFileURL(
+    join(process.cwd(), 'dist', 'server', 'index.js')
+  ).href;
+  const mod = await import(serverPath);
   const app =
     (typeof mod.default === 'function' ? mod.default : (mod as any).app) ||
     (typeof (mod as any).createApp === 'function' ? (mod as any).createApp() : (mod as any).app);
@@ -16,7 +21,10 @@ async function loadApp() {
   }
 
   try {
-    const routes = await import('../dist/server/routes.js');
+    const routesPath = pathToFileURL(
+      join(process.cwd(), 'dist', 'server', 'routes.js')
+    ).href;
+    const routes = await import(routesPath);
     if (typeof routes.registerRoutes === 'function') {
       await routes.registerRoutes(app);
     }
