@@ -4,7 +4,13 @@ import { Link } from "wouter";
 
 export function HeroBanner() {
   return (
-    <div className="relative h-[80vh] w-full bg-cover bg-center bg-[url('https://cdn.shopify.com/s/files/1/0811/9576/1939/files/L1280520_1_2_163d4731-015c-483d-a689-a82cdb5ffbb2.png?v=1752209022')] flex items-center justify-center">
+    <div
+      className="relative h-[80vh] w-full bg-cover bg-center flex items-center justify-center"
+      style={{
+        backgroundImage:
+          "url('https://cdn.shopify.com/s/files/1/0811/9576/1939/files/L1280520_1_2_163d4731-015c-483d-a689-a82cdb5ffbb2.png?v=1752209022')",
+      }}
+    >
       <div className="bg-black/50 text-white p-8 text-center rounded max-w-xl">
         <h1 className="text-4xl md:text-5xl font-light mb-4">
           Nouvelle Collection 2025
