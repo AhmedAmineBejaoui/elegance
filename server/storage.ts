@@ -50,8 +50,11 @@ export interface IStorage {
     maxPrice?: number;
     isActive?: boolean;
     isFeatured?: boolean;
-    limit?: number;
+    isOnSale?: boolean;
+    sizes?: string[];
+    colors?: string[];
     sort?: string;
+    limit?: number;
   }): Promise<Product[]>;
   getProductById(id: number): Promise<Product | undefined>;
   getProductBySlug(slug: string): Promise<Product | undefined>;
@@ -197,6 +200,10 @@ export class DatabaseStorage implements IStorage {
     maxPrice?: number;
     isActive?: boolean;
     isFeatured?: boolean;
+    isOnSale?: boolean;
+    sizes?: string[];
+    colors?: string[];
+    sort?: string;
     limit?: number;
   }): Promise<Product[]> {
     const conditions = [];
@@ -206,20 +213,29 @@ export class DatabaseStorage implements IStorage {
     }
     if (filters?.search) {
       conditions.push(
-        sql`${products.name} ILIKE ${`%${filters.search}%`} OR ${products.description} ILIKE ${`%${filters.search}%`}`
+        sql`(${products.name} ILIKE ${`%${filters.search}%`} OR ${products.description} ILIKE ${`%${filters.search}%`})`
       );
     }
-    if (filters?.minPrice) {
-      conditions.push(sql`${products.price} >= ${filters.minPrice}`);
+    if (filters?.minPrice !== undefined) {
+      conditions.push(sql`COALESCE(LEAST(${products.salePrice}, ${products.price}), ${products.price}) >= ${filters.minPrice}`);
     }
-    if (filters?.maxPrice) {
-      conditions.push(sql`${products.price} <= ${filters.maxPrice}`);
+    if (filters?.maxPrice !== undefined) {
+      conditions.push(sql`COALESCE(LEAST(${products.salePrice}, ${products.price}), ${products.price}) <= ${filters.maxPrice}`);
     }
     if (filters?.isActive !== undefined) {
       conditions.push(eq(products.isActive, filters.isActive));
     }
     if (filters?.isFeatured !== undefined) {
       conditions.push(eq(products.isFeatured, filters.isFeatured));
+    }
+    if (filters?.isOnSale) {
+      conditions.push(sql`${products.salePrice} IS NOT NULL AND ${products.salePrice} < ${products.price}`);
+    }
+    if (filters?.sizes?.length) {
+      conditions.push(sql`${products.sizes} && ARRAY[${sql.join(filters.sizes.map(size => sql`${size}`), sql`, `)}]::text[]`);
+    }
+    if (filters?.colors?.length) {
+      conditions.push(sql`${products.colors} && ARRAY[${sql.join(filters.colors.map(color => sql`${color}`), sql`, `)}]::text[]`);
     }
     const baseQuery = conditions.length > 0
       ? db.select().from(products).where(and(...conditions))
@@ -230,7 +246,7 @@ export class DatabaseStorage implements IStorage {
       'price-asc': asc(products.price),
       'price-desc': desc(products.price),
     };
-    const orderExpr = orderMap[filters?.sort ?? 'newest'];
+    const orderExpr = orderMap[filters?.sort ?? 'newest'] ?? orderMap.newest;
     const orderedQuery = baseQuery.orderBy(orderExpr);
 
     const limitedQuery = filters?.limit

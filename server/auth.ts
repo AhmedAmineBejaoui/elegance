@@ -82,7 +82,8 @@ export async function setupAuth(app: Express): Promise<void> {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 7 jours
   const PgStore = connectPg(session);
   const sessionStore = new PgStore({
-    pool: createPool({ connectionString }),
+    // VercelPool exposes the pg query/connect interface used by the session store.
+    pool: createPool({ connectionString }) as unknown as import("pg").Pool,
     createTableIfMissing: false, // mets true si la table "sessions" n'existe pas
     ttl: sessionTtl / 1000, // connect-pg-simple attend des secondes si set via "ttl"
     tableName: "sessions",

@@ -35,6 +35,7 @@ export const getQueryFn: <T>(options: {
     const url = `${queryKey.join("/") as string}`;
     const res = await fetch(`${API_BASE}${url}`, {
       credentials: "include",
+      signal: AbortSignal.timeout(15000),
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {

@@ -1,3 +1,33 @@
+# ELEGANCE — boutique en ligne
+
+## Développement local
+
+```sh
+npm ci
+# Frontend Vite (proxy /api vers localhost:5000)
+npm run dev
+# Autre terminal, après configuration de .env et PostgreSQL
+npm run dev:api
+```
+
+`ELEGANCE_API_TARGET` permet de choisir la cible du proxy de développement. Il ne modifie pas les URL de production.
+
+## Vérification et déploiement Vercel
+
+```sh
+npm run check
+npm run build
+npm run test:assets
+```
+
+Les images sont versionnées dans `public/images/`. Vite utilise explicitement ce dossier à la racine du dépôt, même si son application est dans `client/`. Vercel doit servir les fichiers existants avant le repli SPA vers `index.html`. `test:assets` vérifie les fichiers générés et cet ordre de routage.
+
+L’accueil et ses photographies ne dépendent pas de la disponibilité de la base. Les produits, tarifs, disponibilités, commandes et inscriptions à la newsletter utilisent toujours l’API réelle. Un échec d’image produit affiche « Visuel à venir », sans substituer une photographie d’un autre article. Le catalogue applique les filtres de promotion, prix effectif, tailles et couleurs côté serveur, avec recherche groupée pour respecter les autres filtres.
+
+Le guide des tailles explique la prise de mesures sans inventer de correspondances propres aux produits. Aucun seed ou changement de schéma n’est nécessaire pour ces améliorations. Le script `npm run seed` est réservé à une base de développement et remplace ses produits et catégories.
+
+---
+
 
 # Pour demarrer le projet 
 

@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { drizzleDb as db } from "./db";
 import { products, categories } from "../shared/schema"; // ← Bien vérifier le chemin
 
 async function seed() {
@@ -28,7 +28,7 @@ async function seed() {
       categoryId: 1, // correspond à la catégorie "Robes"
       isActive: true,
       isFeatured: true,
-      images: ["https://via.placeholder.com/300"],
+      images: ["/images/categories/robes.jpg"],
       sizes: ["S", "M", "L"],
       colors: ["Rouge", "Noir"],
       tags: ["soirée", "élégant"],

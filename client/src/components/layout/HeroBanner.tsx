@@ -1,7 +1,7 @@
 // client/src/components/layout/HeroBanner.tsx
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import heroBannerImage from '/images/hero-banner.jpg';
+const heroBannerImage = "/images/hero-banner.jpg";
 
 
 export function HeroBanner() {
@@ -14,7 +14,7 @@ export function HeroBanner() {
     >
       <div className="bg-black/50 text-white p-8 text-center rounded max-w-xl">
         <h1 className="text-4xl md:text-5xl font-light mb-4">
-          Nouvelle Collection 2025
+          Nouvelle Collection
         </h1>
         <p className="mb-6 text-lg">
           Découvrez les dernières tendances mode féminine avec des pièces
