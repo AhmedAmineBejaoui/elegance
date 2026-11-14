@@ -16,6 +16,7 @@ import useDebounce from "@/hooks/useDebounce";
 
 export function Header() {
   const [location , navigate] = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,9 +33,11 @@ export function Header() {
     enabled: isAuthenticated,
   });
 
-  const cartItemCount = cartItems.reduce((sum: number, item) => sum + item.quantity, 0);
+  const cartItemCount = (Array.isArray(cartItems) ? cartItems : []).reduce((sum: number, item) => sum + item.quantity, 0);
 
   const navigation = [
+    { name: "COLLECTION", href: "/products" },
+    { name: "PROMOTIONS", href: "/products?promo=true" },
     { name: "NOUVEAUTÉS", href: "/products?featured=true", highlight: true },
 
     {
@@ -67,6 +70,7 @@ export function Header() {
 
   return (
     <>
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:bg-white focus:p-4">Aller au contenu</a>
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm" data-testid="header">
         {/* Announcement bar */}
         <div className="bg-foreground text-background text-xs text-center py-2 px-4">
@@ -80,7 +84,7 @@ export function Header() {
 
           {/* Logo */}
             <Link href="/" className="flex-1 " data-testid="logo">
-              <h1 className="text-2xl font-light tracking-wide text-foreground">ELEGANCE</h1>
+              <span className="text-xl sm:text-2xl font-light tracking-[.16em] text-foreground">ELEGANCE</span>
             </Link>
 
             {/* Desktop Search */}
@@ -88,7 +92,8 @@ export function Header() {
               <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  type="text"
+                  type="search"
+                  aria-label="Rechercher dans le catalogue"
                   placeholder="Rechercher des produits..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -115,12 +120,13 @@ export function Header() {
             
 
             {/* Action Icons */}
-            <div className="flex flex-1 items-center justify-end space-x-4">
+            <div className="flex sm:flex-1 items-center justify-end gap-1 sm:gap-3">
               <Button
                 variant="ghost"
                 size="sm"
                 className="md:hidden text-muted-foreground hover:text-foreground"
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
+                aria-label="Ouvrir la recherche"
                 data-testid="search-button"
               >
                 <Search className="h-4 w-4" />
@@ -131,6 +137,7 @@ export function Header() {
                   variant="ghost"
                   size="sm"
                   className="relative text-muted-foreground hover:text-foreground"
+                  aria-label="Mes favoris"
                   data-testid="wishlist-button"
                 >
                   <Heart className="h-4 w-4" />
@@ -148,6 +155,7 @@ export function Header() {
                   size="sm"
                   className="relative text-muted-foreground hover:text-foreground"
                   onClick={() => setIsCartOpen(true)}
+                  aria-label="Ouvrir le panier"
                   data-testid="cart-button"
                 >
                   <ShoppingBag className="h-4 w-4" />
@@ -224,14 +232,14 @@ export function Header() {
               )}
 
               {/* Mobile Menu */}
-              <Sheet>
+              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" className="lg:hidden" data-testid="mobile-menu-button">
+                  <Button variant="ghost" size="sm" className="lg:hidden" aria-label="Ouvrir le menu" data-testid="mobile-menu-button">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-80">
-                  <div className="flex flex-col space-y-4 mt-8">
+                  <div className="flex flex-col space-y-4 mt-8" onClick={(e) => { if ((e.target as HTMLElement).closest("a")) setIsMenuOpen(false); }}>
                     {navigation.map((item) => (
                       item.items ? (
                         <div key={item.name} className="space-y-2">
@@ -333,7 +341,8 @@ export function Header() {
           <div className="md:hidden px-4 pb-4 border-b border-border">
             <form onSubmit={handleSearch} className="relative">
               <Input
-                type="text"
+                type="search"
+                aria-label="Rechercher dans le catalogue"
                 placeholder="Rechercher des produits..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -345,6 +354,7 @@ export function Header() {
                 size="sm"
                 variant="ghost"
                 className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                aria-label="Rechercher"
                 data-testid="mobile-search-submit"
               >
                 <Search className="h-4 w-4" />

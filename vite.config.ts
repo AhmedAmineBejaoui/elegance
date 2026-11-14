@@ -13,11 +13,13 @@ export default defineConfig({
     },
   },
   root: path.resolve(import.meta.dirname, "client"),
+  publicDir: path.resolve(import.meta.dirname, "public"),
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
   },
   server: {
+    proxy: { "/api": { target: process.env.ELEGANCE_API_TARGET || "http://localhost:5000", changeOrigin: true } },
     fs: {
       strict: true,
       deny: ["**/.*"],

@@ -283,6 +283,9 @@ app.get("/api/newsletter/status", isAuthenticated, async (req: any, res) => {
         maxPrice: req.query.maxPrice ? Number(req.query.maxPrice as string) : undefined,
         isActive: req.query.isActive ? req.query.isActive === 'true' : true,
         isFeatured: req.query.isFeatured ? req.query.isFeatured === 'true' : undefined,
+        isOnSale: req.query.isOnSale === 'true' || req.query.promo === 'true',
+        sizes: typeof req.query.sizes === 'string' ? req.query.sizes.split(',').filter(Boolean) : undefined,
+        colors: typeof req.query.colors === 'string' ? req.query.colors.split(',').filter(Boolean) : undefined,
         limit: req.query.limit ? Number(req.query.limit as string) : undefined,
         sort: req.query.sort as string,
       };

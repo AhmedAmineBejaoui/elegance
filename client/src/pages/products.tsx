@@ -9,72 +9,54 @@ import { Footer } from "@/components/layout/footer";
 import { ProductCard } from "@/components/products/product-card";
 import { ProductFilters } from "@/components/products/product-filters";
 import { useQuery } from "@tanstack/react-query";
-import type { Product, Category } from "@shared/schema";
+import type { Product } from "@shared/schema";
 
 export default function Products() {
   const searchParams = new URLSearchParams(useSearch());
-  const [location, navigate] = useLocation();
-  
-  const [filters, setFilters] = useState({
-    categoryId: searchParams.get("categoryId") ? parseInt(searchParams.get("categoryId")!) : undefined,
+  const [, navigate] = useLocation();
+  const filters = {
+    categoryId: searchParams.get("categoryId") ? Number(searchParams.get("categoryId")) : undefined,
     search: searchParams.get("search") || "",
-    minPrice: searchParams.get("minPrice") ? parseFloat(searchParams.get("minPrice")!) : undefined,
-    maxPrice: searchParams.get("maxPrice") ? parseFloat(searchParams.get("maxPrice")!) : undefined,
+    minPrice: searchParams.has("minPrice") ? Number(searchParams.get("minPrice")) : undefined,
+    maxPrice: searchParams.has("maxPrice") ? Number(searchParams.get("maxPrice")) : undefined,
     isFeatured: searchParams.get("featured") === "true" ? true : undefined,
-    isOnSale:
-      searchParams.get("sale") === "true" ||
-      searchParams.get("promo") === "true"
-        ? true
-        : undefined,
-  });
-  
-  const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [searchTerm, setSearchTerm] = useState(filters.search || "");
-
-  const { data: productsData = [], isLoading, isError } = useQuery<Product[]>({
-    queryKey: [`/api/products?${new URLSearchParams(
-      Object.fromEntries(
-        Object.entries(filters).filter(([, value]) => value !== undefined && value !== "")
-          .map(([key, value]) => [key, String(value)])
-      )
-    ).toString()}`],
-  });
-
-  const { data: categoriesData = [] } = useQuery<Category[]>({
-    queryKey: ["/api/categories"],
-  });
-
-  const products = Array.isArray(productsData) ? productsData : [];
-  const categories = Array.isArray(categoriesData) ? categoriesData : [];
-
-  // Update URL when filters change
-  useEffect(() => {
-    const params = new URLSearchParams();
-    
-    if (filters.categoryId) params.set("categoryId", filters.categoryId.toString());
-    if (filters.search) params.set("search", filters.search);
-    if (filters.minPrice) params.set("minPrice", filters.minPrice.toString());
-    if (filters.maxPrice) params.set("maxPrice", filters.maxPrice.toString());
-    if (filters.isFeatured) params.set("featured", "true");
-    if (filters.isOnSale) params.set("promo", "true");
-    if (sortBy !== "newest") params.set("sort", sortBy);
-
-    const newSearch = params.toString();
-    const newPath = `/products${newSearch ? `?${newSearch}` : ""}`;
-    
-    if (location !== newPath) {
-      navigate(newPath, { replace: true });
-    }
-  }, [filters, sortBy, location, navigate]);
-
-  const handleFiltersChange = (newFilters: any) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    isOnSale: searchParams.get("promo") === "true" || searchParams.get("sale") === "true" ? true : undefined,
+    sizes: searchParams.get("sizes")?.split(",").filter(Boolean),
+    colors: searchParams.get("colors")?.split(",").filter(Boolean),
   };
+  const sortBy = searchParams.get("sort") || "newest";
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [searchTerm, setSearchTerm] = useState(filters.search);
+  useEffect(() => setSearchTerm(filters.search), [filters.search]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFilters(prev => ({ ...prev, search: searchTerm }));
+  const setFilters = (next: typeof filters | ((previous: typeof filters) => Partial<typeof filters>)) => {
+    const result = typeof next === "function" ? { ...filters, ...next(filters) } : next;
+    const params = new URLSearchParams();
+    Object.entries(result).forEach(([key, value]) => {
+      if (value !== undefined && value !== "" && (!Array.isArray(value) || value.length)) {
+        params.set(key === "isFeatured" ? "featured" : key === "isOnSale" ? "promo" : key, String(value));
+      }
+    });
+    if (sortBy !== "newest") params.set("sort", sortBy);
+    navigate(`/products?${params}`);
+  };
+  const setSortBy = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("sort", value);
+    navigate(`/products?${params}`);
+  };
+  const queryParams = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== "") queryParams.set(key, String(value));
+  });
+  const { data: productsData = [], isLoading, isError, refetch } = useQuery<Product[]>({
+    queryKey: [`/api/products?${queryParams}`],
+  });
+  const products = Array.isArray(productsData) ? productsData : [];
+  const handleFiltersChange = (newFilters: Partial<typeof filters>) => setFilters(previous => ({ ...previous, ...newFilters }));
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    setFilters(previous => ({ ...previous, search: searchTerm.trim() }));
   };
 
   const sortedProducts = [...products].sort((a, b) => {
@@ -103,19 +85,21 @@ export default function Products() {
     <div className="min-h-screen">
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
+      <main id="main-content" className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8" data-testid="breadcrumb">
-          <span>Accueil</span>
+          <a href="/" className="hover:underline">Accueil</a>
           <span>/</span>
           <span className="text-gray-900 font-medium">Produits</span>
         </nav>
 
+        <div className="flex flex-wrap justify-between items-end gap-4 mb-8"><div><p className="eyebrow text-stone-500 mb-3">Le vestiaire ELEGANCE</p><h1 className="font-serif text-4xl">{filters.isOnSale ? "Les promotions" : filters.isFeatured ? "Les nouveautés" : "La collection"}</h1></div></div>
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="mb-8">
           <div className="flex gap-2 max-w-2xl">
             <Input
-              type="text"
+              aria-label="Rechercher dans la collection"
+              type="search"
               placeholder="Rechercher des produits..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -128,14 +112,14 @@ export default function Products() {
           </div>
         </form>
 
-        <div className="flex gap-8">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Filters Sidebar */}
           <ProductFilters filters={filters} onFiltersChange={handleFiltersChange} />
 
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {/* Toolbar */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
               <div className="flex items-center space-x-4">
                 <span className="text-gray-600" data-testid="products-count">
                   {sortedProducts.length} produit{sortedProducts.length !== 1 ? "s" : ""}
@@ -147,7 +131,7 @@ export default function Products() {
                     variant={viewMode === "grid" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => setViewMode("grid")}
-                    data-testid="view-mode-grid"
+                    aria-label="Afficher en grille" data-testid="view-mode-grid"
                   >
                     <Grid className="h-4 w-4" />
                   </Button>
@@ -155,7 +139,7 @@ export default function Products() {
                     variant={viewMode === "list" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => setViewMode("list")}
-                    data-testid="view-mode-list"
+                    aria-label="Afficher en liste" data-testid="view-mode-list"
                   >
                     <List className="h-4 w-4" />
                   </Button>
@@ -164,7 +148,7 @@ export default function Products() {
 
               {/* Sort Dropdown */}
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48" data-testid="products-sort-select">
+                <SelectTrigger aria-label="Trier les produits" className="w-48" data-testid="products-sort-select">
                   <SelectValue placeholder="Trier par" />
                 </SelectTrigger>
                 <SelectContent>
@@ -184,7 +168,7 @@ export default function Products() {
               </div>
             ) : isError ? (
               <div className="text-center py-16">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Service indisponible, réessayez plus tard</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">La collection est momentanément indisponible</h3><Button variant="outline" onClick={() => refetch()}>Réessayer</Button>
               </div>
             ) : sortedProducts.length === 0 ? (
               <div className="text-center py-16" data-testid="no-products">
@@ -201,6 +185,8 @@ export default function Products() {
                       maxPrice: undefined,
                       isFeatured: undefined,
                       isOnSale: undefined,
+                      sizes: undefined,
+                      colors: undefined,
                     })
                   }
                 >
@@ -219,17 +205,10 @@ export default function Products() {
               </div>
             )}
 
-            {/* Load More Button (if needed for pagination) */}
-            {sortedProducts.length > 0 && sortedProducts.length % 20 === 0 && (
-              <div className="text-center mt-12">
-                <Button variant="outline" size="lg" data-testid="load-more-products">
-                  Charger plus de produits
-                </Button>
-              </div>
-            )}
+
           </div>
         </div>
-      </div>
+      </main>
 
       <Footer />
     </div>

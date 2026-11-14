@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 // client/src/App.tsx
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
@@ -7,45 +8,45 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 
 // Pages
-import NotFound from "@/pages/not-found";
+const NotFound = lazy(() => import("@/pages/not-found"));
 import Home from "@/pages/home";
-import Products from "@/pages/products";
-import ProductDetail from "@/pages/product-detail";
-import Cart from "@/pages/cart";
-import Checkout from "@/pages/checkout";
-import About from "@/pages/about";
-import Boutiques from "@/pages/boutiques";
-import FAQ from "@/pages/faq";
-import Contact from "@/pages/contact";
-import Livraison from "@/pages/livraison";
-import Retours from "@/pages/retours";
-import ManteauxTrenchs from "@/pages/manteaux-trenchs";
-import Robes from "@/pages/robes";
-import Chemises from "@/pages/chemises";
-import Jupes from "@/pages/jupes";
-import ShortsPage from "@/pages/shorts";
-import Combinaisons from "@/pages/combinaisons";
-import CGV from "@/pages/cgv";
-import MentionsLegales from "@/pages/mentions-legales";
-import DonneesPersonnelles from "@/pages/donnees-personnelles";
-import NousRejoindre from "@/pages/nous-rejoindre";
-import LaMarque from "@/pages/la-marque";
-import Wishlist from "@/pages/wishlist";
-import AdminDashboard from "@/pages/admin/dashboard";
-import AdminProducts from "@/pages/admin/products";
-import AdminCategories from "@/pages/admin/categories";
-import AdminOrders from "@/pages/admin/orders";
-import AdminCustomers from "@/pages/admin/customers";
-import ProfilePage from "./pages/profile";
-import AuthPage from "./pages/auth";
-import Orders from "@/pages/orders";
-import OrderTracking from "@/pages/order-tracking";
+const Products = lazy(() => import("@/pages/products"));
+const ProductDetail = lazy(() => import("@/pages/product-detail"));
+const Cart = lazy(() => import("@/pages/cart"));
+const Checkout = lazy(() => import("@/pages/checkout"));
+const About = lazy(() => import("@/pages/about"));
+const Boutiques = lazy(() => import("@/pages/boutiques"));
+const FAQ = lazy(() => import("@/pages/faq"));
+const Contact = lazy(() => import("@/pages/contact"));
+const Livraison = lazy(() => import("@/pages/livraison"));
+const Retours = lazy(() => import("@/pages/retours"));
+const ManteauxTrenchs = lazy(() => import("@/pages/manteaux-trenchs"));
+const Robes = lazy(() => import("@/pages/robes"));
+const Chemises = lazy(() => import("@/pages/chemises"));
+const Jupes = lazy(() => import("@/pages/jupes"));
+const ShortsPage = lazy(() => import("@/pages/shorts"));
+const Combinaisons = lazy(() => import("@/pages/combinaisons"));
+const CGV = lazy(() => import("@/pages/cgv"));
+const MentionsLegales = lazy(() => import("@/pages/mentions-legales"));
+const DonneesPersonnelles = lazy(() => import("@/pages/donnees-personnelles"));
+const NousRejoindre = lazy(() => import("@/pages/nous-rejoindre"));
+const LaMarque = lazy(() => import("@/pages/la-marque"));
+const Wishlist = lazy(() => import("@/pages/wishlist"));
+const AdminDashboard = lazy(() => import("@/pages/admin/dashboard"));
+const AdminProducts = lazy(() => import("@/pages/admin/products"));
+const AdminCategories = lazy(() => import("@/pages/admin/categories"));
+const AdminOrders = lazy(() => import("@/pages/admin/orders"));
+const AdminCustomers = lazy(() => import("@/pages/admin/customers"));
+const ProfilePage = lazy(() => import("./pages/profile"));
+const AuthPage = lazy(() => import("./pages/auth"));
+const Orders = lazy(() => import("@/pages/orders"));
+const OrderTracking = lazy(() => import("@/pages/order-tracking"));
 
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
 
-  if (isLoading) {
+  if (isLoading && /^\/(admin|profile|orders)(\/|$)/.test(window.location.pathname)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
@@ -108,7 +109,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Router />
+        <Suspense fallback={<div className="min-h-[60vh] grid place-items-center" role="status">Chargement…</div>}><Router /></Suspense>
       </TooltipProvider>
     </QueryClientProvider>
   );

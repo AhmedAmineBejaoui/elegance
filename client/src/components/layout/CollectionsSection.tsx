@@ -4,17 +4,17 @@ import { Link } from "wouter";
 const collections = [
   {
     title: "Nouveautés",
-    image: "/images/nouveautes.jpg",
+    image: "/images/categories/robes.jpg",
     href: "/products?featured=true"
   },
   {
     title: "Tendances",
-    image: "/images/tendances.jpg",
-    href: "/products?category=tendance"
+    image: "/images/categories/accessoires.jpg",
+    href: "/products"
   },
   {
     title: "Promotions",
-    image: "/images/promotions.jpg",
+    image: "/images/categories/chaussures.jpg",
     href: "/products?promo=true"
   }
 ];

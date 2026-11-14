@@ -352,7 +352,7 @@ export default function AdminDashboard() {
                           </tr>
                         </thead>
                         <tbody>
-                          {asArray(recentOrders).slice(0, 7).map((o) => (
+                          {recentOrders.slice(0, 7).map((o) => (
                             <tr key={String(o.id)} className="border-t hover:bg-muted/40 transition-colors">
                               <td className="p-3 font-medium">#{o.orderNumber}</td>
                               <td className="p-3">{new Date(o.createdAt).toLocaleDateString()}</td>
@@ -388,7 +388,7 @@ export default function AdminDashboard() {
                     <p className="text-muted-foreground py-8 text-center">Aucun produit en stock faible</p>
                   ) : (
                     <ul className="space-y-3">
-                      {asArray(lowStockProducts).slice(0, 6).map((p) => (
+                      {lowStockProducts.slice(0, 6).map((p) => (
                         <li key={String(p.id)} className="flex items-center justify-between rounded-lg border p-3">
                           <div className="flex items-center gap-3">
                             <img src={p.images?.[0] || "/placeholder-product.jpg"} alt={p.name} className="h-10 w-10 rounded object-cover" />

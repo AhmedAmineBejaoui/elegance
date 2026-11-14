@@ -1,3 +1,4 @@
+import { StoreImage } from "@/components/ui/store-image";
 import { useState } from "react";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -88,8 +89,8 @@ export function ProductCard({ product }: ProductCardProps) {
     >
       <div className="relative overflow-hidden">
         <Link href={`/products/${product.slug}`}>
-          <img
-            src={product.images?.[0] || "/placeholder-product.jpg"}
+          <StoreImage
+            src={product.images?.[0] || "/images/product-placeholder.svg"}
             alt={product.name}
             className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
             data-testid={`product-image-${product.id}`}
@@ -111,11 +112,13 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Wishlist Button */}
-        <div className={`absolute top-4 right-4 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`absolute top-4 right-4 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'md:opacity-0 md:group-focus-within:opacity-100'}`}>
           <Button
             variant="secondary"
             size="sm"
             className="rounded-full bg-white/90 hover:bg-white shadow-md"
+            aria-label={isFavorite(product.id) ? `Retirer ${product.name} des favoris` : `Ajouter ${product.name} aux favoris`}
+            aria-pressed={isFavorite(product.id)}
             onClick={handleToggleFavorite}
             data-testid={`product-wishlist-${product.id}`}
           >
@@ -124,7 +127,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Add to Cart Button */}
-        <div className={`absolute bottom-4 left-4 right-4 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`absolute bottom-4 left-4 right-4 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'md:opacity-0 md:group-focus-within:opacity-100'}`}>
           <Button
             className="w-full bg-primary text-white hover:bg-primary/90"
             onClick={handleAddToCart}

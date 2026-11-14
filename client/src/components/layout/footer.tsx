@@ -1,6 +1,6 @@
 // components/Footer.tsx
 
-import { Lock, Truck, RotateCcw, Headphones, Instagram, Facebook } from "lucide-react";
+import { Lock, Truck, RotateCcw, Headphones,  } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { API_BASE } from "@/lib/api";
 
 export function Footer() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -20,9 +21,12 @@ export function Footer() {
       setMessage("Adresse email invalide");
       return;
     }
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       const res = await fetch(`${API_BASE}/api/newsletter`, {
         method: "POST",
+        signal: AbortSignal.timeout(15000),
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
@@ -37,7 +41,9 @@ export function Footer() {
       queryClient.invalidateQueries({ queryKey: ["/api/newsletter/status"] });
     } catch (err: any) {
       setStatus("error");
-      setMessage(err.message || "Une erreur s'est produite");
+      setMessage("Inscription impossible pour le moment. Réessayez dans quelques instants.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -70,25 +76,29 @@ export function Footer() {
       </div>
 
       {/* Newsletter */}
-      <div className="text-center py-8 px-4">
-        <h2 className="text-2xl font-bold mb-1">INSCRIVEZ-VOUS</h2>
+      <div id="newsletter" className="text-center py-14 px-4 bg-[#f6f3ee]">
+        <h2 className="text-2xl font-bold mb-1">Restons inspirés</h2>
         <p className="text-gray-700 mb-4">Abonnez-vous à notre newsletter afin de recevoir nos dernières collections et nos offres.</p>
         <form onSubmit={handleSubmit} className="flex justify-center max-w-md mx-auto">
           <Input
+            type="email"
+            required
+            autoComplete="email"
+            aria-label="Votre adresse e-mail pour la newsletter"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Saisir votre adresse email"
             className="rounded-none border-black"
           />
-          <Button type="submit" className="rounded-none bg-black text-white px-6">
-            S'INSCRIRE
+          <Button disabled={isSubmitting} type="submit" className="rounded-none bg-black text-white px-6">
+            {isSubmitting ? "EN COURS…" : "S’INSCRIRE"}
           </Button>
         </form>
-        {status !== "idle" && <p className="mt-2 text-sm">{message}</p>}
+        {status !== "idle" && <p role="status" aria-live="polite" className="mt-2 text-sm">{message}</p>}
       </div>
 
       {/* Navigation Links */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-6 px-6 py-10 text-gray-800">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-6 px-6 py-10 text-gray-800">
         <div>
           <h3 className="font-bold mb-2">SERVICES</h3>
           <ul className="space-y-1">
@@ -125,10 +135,6 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          
-          
-        </div>
-        <div>
           <h3 className="font-bold mb-2">PAGES</h3>
           <ul className="space-y-1">
             <li><a href="/">Accueil</a></li>
@@ -146,10 +152,10 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t py-4 px-6 flex flex-col md:flex-row items-center justify-between text-xs">
-        <div className="mb-2 md:mb-0 font-semibold">ELEGANCE © 2025 </div>
+        <div className="mb-2 md:mb-0 font-semibold">ELEGANCE © {new Date().getFullYear()} </div>
         <div className="flex space-x-6">
-          <a href="#" className="flex items-center gap-1"><Instagram className="w-4 h-4" /> INSTAGRAM</a>
-          <a href="#" className="flex items-center gap-1"><Facebook className="w-4 h-4" /> FACEBOOK</a>
+          <a href="/la-marque" className="underline underline-offset-4">LA MARQUE</a>
+          <a href="/contact" className="underline underline-offset-4">CONTACT</a>
 
         </div>
       </div>

@@ -3,7 +3,7 @@ import { API_BASE } from "@/lib/api";
 import { useEffect } from "react";
 
 async function fetchAuthUser() {
-  const res = await fetch(`${API_BASE}/api/auth/user`, { credentials: "include" });
+  const res = await fetch(`${API_BASE}/api/auth/user`, { credentials: "include", signal: AbortSignal.timeout(10000) });
 
   if (res.status === 401) {
     return { user: null }; // ✅ au lieu de throw

@@ -1,3 +1,5 @@
+import { SizeGuide } from "@/components/products/size-guide";
+import { StoreImage } from "@/components/ui/store-image";
 import { useState, useEffect } from "react";
 import { useRoute, Link } from "wouter";
 import {
@@ -263,8 +265,8 @@ export default function ProductDetail() {
           {/* Product Images */}
           <div className="space-y-4">
             <div className="relative overflow-hidden rounded-lg bg-gray-100">
-              <img
-                src={product.images?.[selectedImageIndex] || "/placeholder-product.jpg"}
+              <StoreImage
+                src={product.images?.[selectedImageIndex] || "/images/product-placeholder.svg"}
                 alt={product.name}
                 className="w-full h-96 lg:h-[600px] object-cover"
                 data-testid="product-main-image"
@@ -293,7 +295,7 @@ export default function ProductDetail() {
                     }`}
                     data-testid={`product-thumbnail-${index}`}
                   >
-                    <img
+                    <StoreImage
                       src={image}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-full object-cover"
@@ -362,6 +364,8 @@ export default function ProductDetail() {
                 </Select>
               </div>
             )}
+
+            <SizeGuide />
 
             {/* Color Selection */}
             {product.colors && product.colors.length > 0 && (
